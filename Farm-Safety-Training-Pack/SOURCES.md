@@ -28,6 +28,18 @@ This training pack is built on current UK Health and Safety Executive (HSE) guid
 - Farmers Weekly — Tractors on the road, rules and regulations: https://www.fwi.co.uk/machinery/tractors-road-rights-wrongs-rules-regulations
 - Round baler / bale handling safety (extension agricultural safety programmes)
 
+## Machine specifications (for the Module 15 handbook)
+*Operating limits quoted in the handbook are indicative, from manufacturer/spec-sheet data; the
+machine's own operator manual and load chart are always the authority.*
+- JCB 541-70 Loadall — LECTURA Specs: https://www.lectura-specs.com/en/model/forklifts/telehandlers-jcb/541-70-1048714
+- JCB 516-40 — LECTURA Specs: https://www.lectura-specs.com/en/model/forklifts/telehandlers-jcb/516-40-1160926 ; Ritchie Specs: https://www.ritchiespecs.com/model/jcb-516-40-telescopic-forklift
+- New Holland BB940A large square baler — Ritchie Specs: https://www.ritchiespecs.com/model/new-holland-bb940a-standard-baler
+- Case IH Puma CVX, John Deere 6R/6150R, Kuhn GF tedders / GA rakes / GMD disc mowers — manufacturer product pages and operator manuals
+- HSE — Lift trucks ACOP/guidance and PUWER/LOLER; HSE agriculture machinery pages (as above)
+
+## Farm data
+- Field names, boundaries and map rendered from the farm's own KML (`Farm-Map/Truleigh_Manor_Farm_Field_Maps.kml`).
+
 ## Recommended accredited training providers
 - **Lantra** (telehandler/RTITB, ATV, etc.)
 - **City & Guilds NPTC**

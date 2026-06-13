@@ -22,11 +22,15 @@ Fill this in during induction and keep it in the cab / on your phone:
 | | |
 |---|---|
 | **Farm name** | Truleigh Manor Farm |
-| **Full address & postcode** | _________________________________________ |
-| **what3words** | _________________________________________ |
-| **OS grid reference** | _________________________________________ |
-| **Nearest road / gate to direct ambulance to** | _________________________________________ |
+| **Full address & postcode** | Edburton Road, Henfield, **BN5 9LL** |
+| **what3words — farm entrance** | `///chicken.airless.hazy` (https://w3w.co/chicken.airless.hazy) |
+| **what3words — Truleigh Sands** | `///playback.poker.touched` (https://w3w.co/playback.poker.touched) |
+| **Field name/number** | Give the field you're in (see [Module 16](16-Farm-Map-and-Field-Names.md)) |
+| **Nearest road / gate to direct ambulance to** | Farm entrance off Edburton Road (`///chicken.airless.hazy`) |
 | **Nearest defibrillator (if any)** | _________________________________________ |
+| **Emergency contacts** | Ben Hogan **07876 683949** · Sandra Windus **07901 521832** · Office **01903 816065** |
+
+*See the printable [Emergency Information Card](EMERGENCY-INFORMATION-CARD.md) — keep one in every cab.*
 
 When you call: stay calm, say **where** (postcode + what3words), **what happened**, **how many** hurt, and **what injuries**. Don't hang up until told to. If you can, send someone to the gate to flag the ambulance down.
 

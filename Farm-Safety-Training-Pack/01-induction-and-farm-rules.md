@@ -27,15 +27,18 @@ Your supervisor will walk you round and show you:
 
 - [ ] The farm layout: fields, yard, tracks, gateways, the route hay/haylage takes from field to stack.
 - [ ] Where vehicles and machines move, and where pedestrians are safe to stand/walk.
-- [ ] Overhead power lines and their routes (mark them on a map — see Module 08).
-- [ ] Slopes, ditches, ponds, soft ground, and known tipping/overturn risks.
+- [ ] Overhead power lines and their routes (**mark them on the [farm map — Module 16](16-Farm-Map-and-Field-Names.md)** as part of the markup exercise).
+- [ ] The **field names and layout** ([Module 16](16-Farm-Map-and-Field-Names.md)) — so you can say exactly where you are.
+- [ ] Slopes, ditches, ponds, soft ground, and known tipping/overturn risks (e.g. Sands Hill, The Hill, Banky Sands, The Lakes, The Brooks).
 - [ ] The fuel store, chemical/pesticide store, and any gas/oxy-acetylene.
 - [ ] Where the **first aid kit(s)** are, and where the **eye wash** is.
 - [ ] Where the **fire extinguishers** are (in buildings and on machines).
 - [ ] The **assembly point** if there's a fire or emergency.
-- [ ] The farm's **full postal address, postcode and what3words / grid reference** for calling 999 (write it down — see Module 09).
+- [ ] The farm's **address and what3words** for calling 999 (also on the [Emergency Information Card](EMERGENCY-INFORMATION-CARD.md) and Module 09):
+  - **Truleigh Manor Farm, Edburton Road, Henfield, BN5 9LL**
+  - Farm entrance: `///chicken.airless.hazy` · Truleigh Sands: `///playback.poker.touched`
 - [ ] Welfare: toilet, hand-washing, drinking water, breaks, somewhere to shelter.
-- [ ] Who your supervisor is, and how to contact them at any moment (phone number saved).
+- [ ] Who your supervisor is, and how to contact them at any moment (save these numbers): **Ben Hogan 07876 683949**, **Sandra Windus 07901 521832**, **Office 01903 816065**.
 
 ---
 

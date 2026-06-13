@@ -44,6 +44,9 @@ This pack is designed to be **worked through in order, with a supervisor**, befo
 | 12 | [Young person risk assessment template](12-young-person-risk-assessment.md) | The legally required assessment — fill in before work starts |
 | 13 | [Practical competency checklist & sign-off](13-competency-checklist-signoff.md) | Per-machine demonstration and sign-off record |
 | 14 | [Training record & certificate](14-training-record-and-certificate.md) | Proof of completion to keep on file |
+| 15 | [Machinery handbook](15-Machinery-Handbook/README.md) | Safe operation & maintenance for our specific kit (tractors, telehandlers, tedder, rake, baler, mowers, attachments, trailers) — incl. fuelling & greasing |
+| 16 | [Farm map & field names](16-Farm-Map-and-Field-Names.md) | The farm map, all 33 field names, and the hazard-markup exercise |
+| — | [Emergency Information Card](EMERGENCY-INFORMATION-CARD.md) | Print & keep in the cab: 999 info, what3words, emergency contacts |
 
 ---
 
