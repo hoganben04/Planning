@@ -181,7 +181,7 @@
           : ` · ${spec ? spec.name.toLowerCase() : ''}`));
         return;
       }
-      nodes.readout.appendChild(h('b', {}, [`${s.efforts} efforts`]));
+      nodes.readout.appendChild(h('b', {}, [plural(s.efforts, 'effort')]));
       nodes.readout.appendChild(document.createTextNode(
         ` · ${s.lengthM}m · ${s.timeAllowed} · ${s.horseName}`));
       if (s.errors || s.warnings) {
@@ -484,7 +484,7 @@
       local.mode = 'build'; local.panel = 'build';
       recheck(); renderModebar(); renderPanel(); redraw();
       toast('Route saved');
-      announce('Route saved. ' + check.summary.efforts + ' jumping efforts.');
+      announce(`Route saved. ${plural(check.summary.efforts, 'jumping effort')}.`);
     }
 
     function numberInPlaceOrder() {

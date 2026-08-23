@@ -34,8 +34,19 @@
 .sheet__facts { text-align: right; font-size: 10pt; }
 .sheet__facts b { font-size: 13pt; }
 
-.sheet__diagram { break-inside: avoid; page-break-inside: avoid; text-align: center; }
-.sheet__diagram svg { width: 100%; max-width: 176mm; height: auto; }
+/* The plan beside the tables. A tall arena at full page width would be over
+   400mm high, so it gets its own narrow column and the numbers sit next to it. */
+.sheet__body { display: grid; grid-template-columns: auto 1fr; gap: 6mm; align-items: start; }
+.sheet__diagram { break-inside: avoid; page-break-inside: avoid; border: .5pt solid #ccc; border-radius: 1.5mm; padding: 1mm; }
+.sheet__diagram svg { display: block; }
+.sheet__tables { min-width: 0; }
+.sheet__tables h2:first-child { margin-top: 0; }
+
+/* A wide arena is the other way round: it reads better across the page with the
+   tables underneath. */
+@media print {
+  .sheet[data-arena="wide"] .sheet__body { grid-template-columns: 1fr; }
+}
 
 .sheet h2 { font-size: 12pt; margin: 5mm 0 2mm; }
 

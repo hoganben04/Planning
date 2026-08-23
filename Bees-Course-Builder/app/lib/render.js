@@ -102,7 +102,10 @@
       svg.appendChild(defs(theme));
       svg.appendChild(el('rect', {
         x: view.x, y: view.y, width: view.w, height: view.h,
-        fill: theme.surround, 'data-surround': '1'
+        /* On paper the surround is left white: a grey box that size is a lot of
+           ink for something that carries no information. */
+        fill: state.paperSurround ? theme.paper : theme.surround,
+        'data-surround': '1'
       }));
       svg.appendChild(arenaLayer(arena, theme, state));
       if (check) {

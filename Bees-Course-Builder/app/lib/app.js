@@ -848,6 +848,9 @@
   /* ---- the printable course sheet -------------------------------------- */
   function buildSheet(course, check, horse) {
     clear(el.sheet);
+    /* A wide arena reads better across the page than beside the tables. */
+    el.sheet.setAttribute('data-arena',
+      course.arena.widthM / course.arena.lengthM > 1.3 ? 'wide' : 'tall');
     const level = root.bcbLevel(course.levelId);
     const s = check.summary;
     const settings = store.db.settings;
@@ -868,19 +871,34 @@
       ])
     ]));
 
-    /* The plan, drawn fresh at full arena so the on-screen zoom does not leak in. */
-    const holder = h('div', { class: 'sheet__diagram' });
-    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    holder.appendChild(svg);
-    el.sheet.appendChild(holder);
-    /* light theme for paper, whatever the screen is doing */
-    Render.createRenderer(svg).draw({
-      course, check, horse, settings, dark: false, showGrid: true, showArenaSize: true, ui: {}
-    });
-    svg.setAttribute('width', '100%');
+    /* The plan, drawn fresh at the full arena so the on-screen zoom does not leak
+       into the printout.
 
-    el.sheet.appendChild(h('h2', {}, ['The fences']));
-    el.sheet.appendChild(h('table', {}, [
+       It is sized in millimetres to fit a fixed box rather than given the whole
+       page width. A 20x60m school is three times as long as it is wide, so at
+       176mm across it would be over 400mm tall — off the bottom of an A4 page,
+       taking the tables with it. So the diagram gets a column of its own and the
+       tables sit beside it. */
+    const surround = 4;
+    const aspect = (course.arena.widthM + surround * 2) / (course.arena.lengthM + surround * 2);
+    const boxW = 58, boxH = 150;                       /* millimetres */
+    const fit = Math.min(boxW / aspect, boxH);
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('width', `${(fit * aspect).toFixed(1)}mm`);
+    svg.setAttribute('height', `${fit.toFixed(1)}mm`);
+
+    const plan = h('div', { class: 'sheet__diagram' }, [svg]);
+    const tables = h('div', { class: 'sheet__tables' });
+    el.sheet.appendChild(h('div', { class: 'sheet__body' }, [plan, tables]));
+
+    /* light theme on paper, whatever the screen is doing */
+    Render.createRenderer(svg).draw({
+      course, check, horse, settings, dark: false, showGrid: true,
+      showArenaSize: true, paperSurround: true, ui: {}
+    });
+
+    tables.appendChild(h('h2', {}, ['The fences']));
+    tables.appendChild(h('table', {}, [
       h('thead', {}, [h('tr', {}, [
         h('th', {}, ['No.']), h('th', {}, ['Fence']), h('th', {}, ['Height']),
         h('th', {}, ['Spread']), h('th', {}, ['Filler'])
@@ -898,8 +916,8 @@
     ]));
 
     if (check.legs.length) {
-      el.sheet.appendChild(h('h2', {}, ['The distances']));
-      el.sheet.appendChild(h('table', {}, [
+      tables.appendChild(h('h2', {}, ['The distances']));
+      tables.appendChild(h('table', {}, [
         h('thead', {}, [h('tr', {}, [
           h('th', {}, ['Leg']), h('th', {}, ['Metres']), h('th', {}, ['Feet']),
           h('th', {}, ['Paces']), h('th', {}, ['Strides']), h('th', {}, ['How it rides'])
@@ -917,15 +935,15 @@
 
     const needed = Object.keys(check.kit.needed).filter(k => check.kit.needed[k] > 0);
     if (needed.length) {
-      el.sheet.appendChild(h('h2', {}, ['What to carry out']));
-      el.sheet.appendChild(h('p', {}, [
+      tables.appendChild(h('h2', {}, ['What to carry out']));
+      tables.appendChild(h('p', {}, [
         needed.map(k => `${check.kit.needed[k]} ${C.kitLabel(k, check.kit.needed[k])}`).join(', ') + '.'
       ]));
     }
 
     if (check.issues.length) {
-      el.sheet.appendChild(h('h2', {}, ['Worth checking']));
-      el.sheet.appendChild(h('ul', {}, check.issues.map(i => h('li', {}, [i.message]))));
+      tables.appendChild(h('h2', {}, ['Worth checking']));
+      tables.appendChild(h('ul', {}, check.issues.map(i => h('li', {}, [i.message]))));
     }
 
     el.sheet.appendChild(h('div', { class: 'sheet__notes' }, [
