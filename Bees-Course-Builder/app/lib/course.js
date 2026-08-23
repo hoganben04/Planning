@@ -186,9 +186,29 @@
         add('distance-off', 'warn', assessment.advice, [a.id, b.id], assessment.suggestion);
       }
 
+      /* Two fences close together but facing different ways cannot be ridden as
+         a combination and leave no room to turn either. It is the one course
+         fault that has no fix except moving a fence. */
+      const facing = Math.abs(G.turnBetween(
+        G.bearing(R.jumpNormal(a)), G.bearing(R.jumpNormal(b))));
+      /* Judged on the straight-line gap, not the distance round the track: when
+         two fences face opposite ways the track has to loop right around, so the
+         along-track figure is long and would hide the very fault we are after. */
+      const straightGap = S.measureGap(a, b).clearM;
+      const closeOnTheGround = straightGap > 0
+        && straightGap <= S.trueDistance(model, 2) + model.strideM * 0.4;
+      if (closeOnTheGround && facing >= 45) {
+        add('too-close-to-turn', 'error',
+          `Fences ${assessment.fromLabel} and ${assessment.toLabel} are only `
+          + `${assessment.measured.metresText} apart but face ${Math.round(facing)} degrees `
+          + `apart, so there is no room to turn between them and they cannot be jumped as `
+          + `a combination. One of them has to move.`, [a.id, b.id]);
+      }
+
       /* Two fences a stride or two apart are one obstacle, and should be
          numbered as one. Worth learning before she gets to a show. */
-      if (!sameObstacle && (assessment.category === 'combination' || assessment.category === 'bounce')) {
+      if (!sameObstacle && facing < 45
+        && (assessment.category === 'combination' || assessment.category === 'bounce')) {
         add('combination-not-numbered', 'warn',
           `Fences ${assessment.fromLabel} and ${assessment.toLabel} are only `
           + `${assessment.measured.metresText} apart, which makes them one obstacle — `
@@ -265,6 +285,22 @@
           add('overlapping-fences', 'error',
             `${describe(a)} and ${describe(b)} are on top of each other.`, [a.id, b.id]);
         }
+      }
+    }
+
+    /* -- Room to land. A fence needs ground beyond it as much as in front of it:
+          landing three metres from the boards is how a pony gets hurt, and it is
+          the check a beginner is least likely to think of. -- */
+    for (const j of numbered) {
+      const n = R.jumpNormal(j);
+      const box = S.fenceBox(j);
+      const backOfFence = G.add(box.centre, G.mul(n, G.rayBoxExit(box, n)));
+      const room = roomAhead(backOfFence, n, arena);
+      if (room < MARGINS.landingM) {
+        add('landing-room-short', room < 3 ? 'error' : 'warn',
+          `${describe(j)} leaves only ${room.toFixed(1)}m to land in before the boards. `
+          + `Aim for ${MARGINS.landingM}m so she can land and get straight. Turn the fence `
+          + `round, or move it away from the fence line.`, [j.id]);
       }
     }
 
@@ -401,6 +437,17 @@
     };
   }
 
+  /* How much arena there is ahead of a point, travelling in a direction. */
+  function roomAhead(p, dir, arena) {
+    const u = G.norm(dir);
+    let best = Infinity;
+    if (u.x > 1e-6) best = Math.min(best, (arena.widthM - p.x) / u.x);
+    if (u.x < -1e-6) best = Math.min(best, (0 - p.x) / u.x);
+    if (u.y > 1e-6) best = Math.min(best, (arena.lengthM - p.y) / u.y);
+    if (u.y < -1e-6) best = Math.min(best, (0 - p.y) / u.y);
+    return Math.max(0, Number.isFinite(best) ? best : 0);
+  }
+
   /* What it takes to build this course, in things a rider owns. */
   function kitNeeded(jumps) {
     const total = { wings: 0, poles: 0, walls: 0, planks: 0, gates: 0, trays: 0, fillers: 0 };
@@ -434,7 +481,7 @@
     bcbCourse: {
       id, newHorse, newJump, newCourse, nowIso,
       efforts, renumber, withinCombination,
-      checkCourse, kitNeeded, kitLabel, describe
+      checkCourse, kitNeeded, kitLabel, describe, roomAhead
     }
   };
 });

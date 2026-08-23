@@ -221,3 +221,63 @@ test('the track respects the turn radius and stays inside the arena', () => {
   const ss = chk.route.fenceAt.map(f => f.s);
   for (let i = 1; i < ss.length; i++) assert.ok(ss[i] > ss[i - 1], 'fences run forward');
 });
+
+test('a fence with no room to land in is flagged', () => {
+  /* Facing the boards with three metres to land in. */
+  const tight = courseWith([J({ xM: 10, yM: 57, number: 1 })]);
+  const codesTight = codes(C.checkCourse(tight, PONY, {}));
+  assert.ok(codesTight.includes('landing-room-short'),
+    'landing into the fence line must be flagged');
+
+  /* Turned round, there is the whole arena to land in. */
+  const fine = courseWith([J({ xM: 10, yM: 57, rotationDeg: 180, number: 1 })]);
+  assert.ok(!codes(C.checkCourse(fine, PONY, {})).includes('landing-room-short'));
+});
+
+test('two close fences facing opposite ways cannot be ridden and say so', () => {
+  const c = courseWith([
+    J({ xM: 10, yM: 20, number: 1 }),
+    J({ xM: 10, yM: 27, rotationDeg: 180, number: 2 })
+  ]);
+  const found = codes(C.checkCourse(c, PONY, {}));
+  assert.ok(found.includes('too-close-to-turn'),
+    'no room to turn and not a combination either');
+});
+
+test('the seeded first course is clean, so nothing is being taught wrong', () => {
+  const { bcbStore: ST } = require('../app/lib/store.js');
+  const store = ST.createStore({ storage: null });
+  ST.seed(store);
+  const course = store.db.courses.find(c => c.name === 'First course');
+  assert.ok(course, 'there is a first course');
+  const horse = store.activeHorse();
+  const chk = C.checkCourse(course, horse, store.db.settings);
+  assert.strictEqual(chk.summary.errors, 0, 'no errors in the example course');
+  assert.strictEqual(chk.summary.warnings, 0, 'no warnings in the example course');
+  /* And every distance in it is a true one, which is the point of the example. */
+  for (const leg of chk.legs) {
+    if (leg.category === 'unrelated') continue;
+    assert.ok(leg.verdict === 'true' || leg.verdict.startsWith('slightly-'),
+      `leg ${leg.fromLabel}->${leg.toLabel} should ride true, got ${leg.verdict}`);
+  }
+});
+
+test('the seeded grid uses pony pole spacings', () => {
+  const { bcbStore: ST } = require('../app/lib/store.js');
+  const D = require('../app/data/distances.js');
+  const store = ST.createStore({ storage: null });
+  ST.seed(store);
+  const grid = store.db.courses.find(c => c.name.includes('Trotting poles'));
+  const poles = grid.jumps.filter(j => j.type === 'ground-pole').map(j => j.yM).sort((a, b) => a - b);
+  assert.strictEqual(poles.length, 4);
+  const gap = Math.round((poles[1] - poles[0]) * 100) / 100;
+  const range = D.BCB_POLE_SPACING['pony-large'].trotM;
+  assert.ok(gap >= range[0] && gap <= range[1],
+    `trot pole gap ${gap}m should be inside the large-pony range ${range}`);
+});
+
+test('an unknown fence type from a shared course is drawn as an upright', () => {
+  const { bcbStore: ST } = require('../app/lib/store.js');
+  const repaired = ST.repairCourse({ jumps: [{ type: 'space-rocket', xM: 5, yM: 5 }] });
+  assert.strictEqual(repaired.jumps[0].type, 'vertical');
+});

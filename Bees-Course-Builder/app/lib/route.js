@@ -100,10 +100,14 @@
          to turn between them sends the track off on an absurd loop, so anything
          inside combination range is ridden straight through — which is what
          actually happens on a double or a treble. */
-      const gap = S.measureGap(j, next).clearM;
-      if (gap > 0 && gap <= stride * 2.8) continue;
-
       const nn = jumpNormal(next);
+      const gap = S.measureGap(j, next).clearM;
+      /* ...but only when the two fences actually face the same way. Two fences a
+         stride apart pointing in opposite directions cannot be ridden straight
+         through OR turned between; that is a fault in the course, and course.js
+         reports it rather than us drawing a nonsense loop here. */
+      const sameWay = Math.abs(G.turnBetween(G.bearing(n), G.bearing(nn))) < 45;
+      if (gap > 0 && gap <= stride * 2.8 && sameWay) continue;
       const landing = G.add(centre, G.mul(n, landingM));
       const nextApproach = G.sub(centreOf(next), G.mul(nn, approachM));
       push(landing);
