@@ -96,6 +96,17 @@
     return G.box({ x: jump.xM, y: jump.yM }, widthM, spreadM, jump.rotationDeg || 0);
   }
 
+  /* The same fence, but with the ground it physically stands on. An upright has
+     no spread to jump, yet its wings and pole cups still take up about half a
+     metre — so this is the box to use when asking whether two fences clash,
+     while fenceBox is the one to use when measuring a distance. */
+  const MIN_FOOTPRINT_M = 0.5;
+  function footprintBox(jump) {
+    const b = fenceBox(jump);
+    const depth = Math.max(b.halfD * 2, MIN_FOOTPRINT_M);
+    return G.box(b.centre, b.halfW * 2, depth, jump.rotationDeg || 0);
+  }
+
   /* ---- The gap between two fences -------------------------------------------
      `clearM` is back rail to front rail along the line of travel. The ray-box
      exit test means an oxer set at an angle to the line correctly presents more
@@ -346,7 +357,7 @@
   return {
     bcbStrides: {
       strideModel, trueDistance, trueDistanceTargets,
-      fenceBox, measureGap, assessDistance, crossCheck,
+      fenceBox, footprintBox, measureGap, assessDistance, crossCheck,
       measurement, feetInches, paces,
       fenceLabel, words, strideWords, verdictFor, severityFor
     }
