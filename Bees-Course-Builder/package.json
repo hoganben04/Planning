@@ -1,0 +1,12 @@
+{
+  "name": "bees-course-builder",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Plan show jumping courses and pole work to scale, with stride distances worked out for your own pony.",
+  "scripts": {
+    "dev": "python3 -m http.server 4173 --directory app",
+    "test": "node --test tests/*.test.js",
+    "test:e2e": "playwright test",
+    "icons": "node tools/make_icons.mjs"
+  }
+}

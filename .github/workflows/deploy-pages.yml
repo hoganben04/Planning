@@ -1,15 +1,22 @@
-name: Deploy training app to GitHub Pages
+name: Deploy static apps to GitHub Pages
 
-# Publishes Farm-Safety-Training-Pack/app as a static site.
-# The app folder is the site root, so the app loads at the Pages URL directly.
+# One Pages site, two apps:
+#   /                 -> Farm-Safety-Training-Pack/app  (unchanged URL)
+#   /course-builder/  -> Bees-Course-Builder/app
+#
+# A repository gets exactly ONE Pages site, and each deployment replaces the whole
+# of it. So both apps have to be assembled into a single artifact here — adding a
+# second Pages workflow would mean the two taking turns to delete each other.
 
 on:
   push:
     branches:
       - main
       - claude/farm-safety-training-pack-1v08gi
+      - claude/horse-jumping-planner-ios-0ngx5z
     paths:
       - "Farm-Safety-Training-Pack/app/**"
+      - "Bees-Course-Builder/app/**"
       - ".github/workflows/deploy-pages.yml"
   workflow_dispatch:
 
@@ -39,10 +46,22 @@ jobs:
           # Enable Pages automatically on first run if it isn't already.
           enablement: true
 
-      - name: Upload app as Pages artifact
+      - name: Assemble the site
+        run: |
+          set -euo pipefail
+          rm -rf _site
+          mkdir -p _site/course-builder
+          # The trailing "/." copies dotfiles too, so .nojekyll comes along.
+          cp -R Farm-Safety-Training-Pack/app/. _site/
+          cp -R Bees-Course-Builder/app/. _site/course-builder/
+          touch _site/.nojekyll _site/course-builder/.nojekyll
+          echo "--- site tree ---"
+          find _site -maxdepth 2 -printf '%P\n' | sort
+
+      - name: Upload site as Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: Farm-Safety-Training-Pack/app
+          path: _site
 
       - name: Deploy to GitHub Pages
         id: deployment

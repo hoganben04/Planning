@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8" />
+  <!-- viewport-fit=cover is required or env(safe-area-inset-*) reports zero and
+       the app draws under the notch and the home indicator. -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Bee's Course Builder</title>
+  <meta name="description" content="Plan show jumping courses and pole work to scale, with stride distances worked out for your own pony." />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Bee's Courses" />
+  <meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#10151A" media="(prefers-color-scheme: dark)" />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./icons/icon-180.png" />
+  <link rel="icon" href="./icons/icon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="./styles.css" />
+  <link rel="stylesheet" href="./print.css" media="print" />
+</head>
+<body>
+  <div class="app" id="app">
+    <header class="topbar" id="topbar"></header>
+    <main class="view" id="view" tabindex="-1"></main>
+    <nav class="tabbar" id="tabbar" aria-label="Sections"></nav>
+  </div>
+
+  <!-- The course sheet. Hidden on screen; the only thing that prints. -->
+  <div id="sheet" class="sheet" aria-hidden="true"></div>
+
+  <div class="toasts" id="toasts" aria-live="polite" aria-atomic="false"></div>
+  <div class="sr-only" id="live" aria-live="polite"></div>
+
+  <noscript>
+    <p style="padding:24px;font:16px system-ui">Bee's Course Builder needs JavaScript
+    switched on, because it works out the distances on your phone rather than on a
+    server.</p>
+  </noscript>
+
+  <script src="./data/sources.js"></script>
+  <script src="./data/levels.js"></script>
+  <script src="./data/jumps.js"></script>
+  <script src="./data/arenas.js"></script>
+  <script src="./data/distances.js"></script>
+  <script src="./lib/geometry.js"></script>
+  <script src="./lib/turns.js"></script>
+  <script src="./lib/strides.js"></script>
+  <script src="./lib/route.js"></script>
+  <script src="./lib/course.js"></script>
+  <script src="./lib/store.js"></script>
+  <script src="./lib/render.js"></script>
+  <script src="./lib/interact.js"></script>
+  <script src="./lib/share.js"></script>
+  <script src="./lib/ui.js"></script>
+  <script src="./lib/editor.js"></script>
+  <script src="./lib/app.js"></script>
+</body>
+</html>
