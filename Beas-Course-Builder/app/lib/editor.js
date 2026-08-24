@@ -1,11 +1,12 @@
 /* Bea’s Course Builder — the arena editor.
 
-   Three modes, because they are three different jobs and mixing them on a phone
-   screen makes both harder:
+   Four modes, because they are four different jobs and mixing them on a phone
+   screen makes all of them harder:
 
      Build   put the jumps where you want them
      Number  tap them in the order you will jump them — this is the route
      Check   read what the app makes of it
+     Ride    watch it play out, so she can learn it before she jumps it
 
    Numbering IS the route. The same jumps numbered a different way is a different
    course, which is exactly how a rider thinks about it, and it is why a double
@@ -19,6 +20,7 @@
   const Render = root.bcbRender;
   const Interact = root.bcbInteract;
   const Share = root.bcbShare;
+  const Ride = root.bcbRide;
 
   function createEditor(ctx) {
     const store = ctx.store;
@@ -29,6 +31,10 @@
     let nodes = {};
     let preview = null;
     let panelDirty = false;
+    /* Null unless she is in Ride mode. Holds the built ride, the driver, the
+       metronome and the animation frame, so nothing of the ride survives leaving
+       the mode. */
+    let ridePlay = null;
 
     const local = {
       mode: 'build',
@@ -38,7 +44,10 @@
       showStrides: false,
       showGrid: true,
       paletteAll: false,
-      numberOrder: []
+      numberOrder: [],
+      rideRate: 1,
+      rideFollow: false,
+      rideSound: false
     };
 
     /* ---- reading the current state --------------------------------------- */
@@ -56,6 +65,8 @@
         dark: dark(), showGrid: local.showGrid, showStrides: local.showStrides,
         showArenaSize: !!local.showArenaSize,
         guides: preview ? preview.guides : [],
+        ride: ridePlay ? ridePlay.ride : null,
+        rideState: ridePlay ? ridePlay.rideState : null,
         ui: { view: local.view }
       };
     }
@@ -128,6 +139,7 @@
     }
 
     function unmount() {
+      exitRide();
       window.removeEventListener('resize', onResize);
       document.removeEventListener('keydown', onKey);
       if (interactions) interactions.destroy();
@@ -161,6 +173,18 @@
 
       if (preview && preview.chip) {
         nodes.readout.appendChild(h('b', {}, [preview.chip]));
+        return;
+      }
+      if (local.mode === 'ride') {
+        if (!ridePlay) {
+          nodes.readout.appendChild(document.createTextNode('Number the fences first, then ride it'));
+          return;
+        }
+        /* Kept as a reference: the frame loop writes its text sixty times a
+           second, and building a fresh node that often is wasteful. The clock
+           stays in the panel — on a 390pt screen the caption needs the width,
+           and "stride 3 of 4" is the part she is reading. */
+        nodes.readout.appendChild(nodes.rideCaption = h('b', {}, [ridePlay.rideState.caption]));
         return;
       }
       if (local.mode === 'number') {
@@ -235,6 +259,7 @@
       if (!fresh) { ctx.navigate('#/courses'); return; }
       course = fresh;
       recheck();
+      if (local.mode === 'ride') { exitRide(); enterRide(); }
       renderChrome(); renderTools(); renderPanel(); redraw();
     }
 
@@ -244,11 +269,14 @@
       nodes.modebar.appendChild(segmented([
         { id: 'build', label: 'Build' },
         { id: 'number', label: 'Number' },
-        { id: 'check', label: 'Check' }
+        { id: 'check', label: 'Check' },
+        { id: 'ride', label: 'Ride' }
       ], local.mode, id => {
+        if (local.mode === 'ride' && id !== 'ride') exitRide();
         local.mode = id;
-        local.panel = id === 'check' ? 'checks' : (id === 'number' ? 'number' : 'build');
+        local.panel = id;
         if (id === 'number') { local.numberOrder = []; local.selectedId = null; }
+        if (id === 'ride') { local.selectedId = null; enterRide(); }
         renderModebar(); renderPanel(); redraw();
       }));
     }
@@ -258,6 +286,13 @@
       clear(nodes.panelBody);
       const jump = local.selectedId ? findJump(local.selectedId) : null;
 
+      if (local.mode === 'ride') {
+        /* Left at a peek: the controls are three short rows, and the whole point
+           of the mode is watching the arena. */
+        setPanelOpen(!ridePlay);
+        nodes.panelBody.appendChild(ridePanel());
+        return;
+      }
       if (local.mode === 'number') { setPanelOpen(true); nodes.panelBody.appendChild(numberPanel()); return; }
       if (local.mode === 'check') { setPanelOpen(true); nodes.panelBody.appendChild(checkPanel()); return; }
       if (jump) { setPanelOpen(true); nodes.panelBody.appendChild(inspector(jump)); return; }
@@ -583,6 +618,320 @@
       toast('Moved. Check the new distance.');
     }
 
+    /* ---- Ride mode --------------------------------------------------------
+       She presses Ride and a marker travels the track at the class speed, with
+       the leg and the stride count written out as it goes, so she can learn the
+       route before she sits on the pony.
+
+       All the arithmetic is in ride.js and none of it is here. This part owns the
+       controls, one animation frame at a time, and nothing else. */
+    const ZOOM_WINDOW_M = 26;    /* how much of the arena the follow view holds */
+
+    function enterRide() {
+      if (ridePlay) exitRide();
+      recheck();
+      const built = Ride.buildRide(check, horse());
+      if (!built.rideable) { ridePlay = null; return; }
+      ridePlay = {
+        ride: built,
+        driver: Ride.createDriver(built, { rate: local.rideRate }),
+        metro: Ride.createMetronome(),
+        rideState: Ride.rideStateAt(built, 0),
+        raf: 0,
+        scrubbing: false,
+        savedView: local.view
+      };
+      ridePlay.driver.setRate(local.rideRate, now());
+      /* Start from the whole arena, whatever she had panned to before: a ride
+         that happens off the side of the screen teaches nothing. */
+      local.view = null;
+    }
+
+    function exitRide() {
+      if (!ridePlay) return;
+      if (ridePlay.raf) cancelAnimationFrame(ridePlay.raf);
+      ridePlay.driver.pause();
+      ridePlay.metro.disable();
+      local.view = ridePlay.savedView;
+      ridePlay = null;
+      for (const key of ['rideCaption', 'ridePlayBtn', 'rideScrub',
+        'rideScrubText', 'rideSpeed', 'rideFollowBtn', 'rideSoundBtn']) nodes[key] = null;
+    }
+
+    function now() {
+      return (window.performance && performance.now) ? performance.now() : Date.now();
+    }
+
+    /* -- the controls -- */
+    function ridePanel() {
+      if (!ridePlay) {
+        return h('div', { class: 'stack' }, [
+          h('h3', {}, ['Nothing to ride yet']),
+          h('p', { class: 'lede' }, [
+            'A ride follows the route, so the fences need numbering first. Tap the '
+            + 'fences in Number mode in the order you will jump them, save the route, '
+            + 'then come back here.'
+          ]),
+          h('button', {
+            class: 'iconbtn iconbtn--primary', type: 'button',
+            onclick: () => {
+              local.mode = 'number'; local.panel = 'number';
+              local.numberOrder = []; local.selectedId = null;
+              renderModebar(); renderPanel(); redraw();
+            }
+          }, ['Number the fences'])
+        ]);
+      }
+
+      const ride = ridePlay.ride;
+      const wrap = h('div', { class: 'ride' });
+
+      nodes.ridePlayBtn = h('button', {
+        class: 'ride__play', type: 'button', onclick: togglePlay
+      }, [playLabel()]);
+
+      wrap.appendChild(h('div', { class: 'ride__row' }, [
+        h('button', {
+          class: 'iconbtn', type: 'button', 'aria-label': 'Back to the fence before',
+          onclick: () => stepFence(-1)
+        }, ['⏮ Back']),
+        nodes.ridePlayBtn,
+        h('button', {
+          class: 'iconbtn', type: 'button', 'aria-label': 'On to the next fence',
+          onclick: () => stepFence(1)
+        }, ['Next ⏭'])
+      ]));
+
+      nodes.rideScrub = h('input', {
+        class: 'ride__scrub', type: 'range', min: 0, max: round2(ride.lengthM), step: 0.1,
+        value: round2(ridePlay.driver.s), 'aria-label': 'How far round the course',
+        oninput: ev => scrubTo(Number(ev.target.value)),
+        onpointerdown: () => { ridePlay.scrubbing = true; },
+        onpointerup: () => { ridePlay.scrubbing = false; },
+        onpointercancel: () => { ridePlay.scrubbing = false; },
+        /* change fires when she lets go, including when her finger left the bar
+           first — without it the bar would stay stuck under her last touch. */
+        onchange: () => { ridePlay.scrubbing = false; }
+      });
+      wrap.appendChild(h('div', { class: 'ride__row' }, [
+        nodes.rideScrub,
+        nodes.rideScrubText = h('span', { class: 'ride__clock' }, [rideClockText()])
+      ]));
+
+      nodes.rideSpeed = segmented([
+        { id: 0.5, label: '½×' }, { id: 0.75, label: '¾×' }, { id: 1, label: '1×' }
+      ], local.rideRate, setRideRate);
+
+      nodes.rideFollowBtn = h('button', {
+        class: 'iconbtn iconbtn--compact', type: 'button',
+        'aria-pressed': String(local.rideFollow),
+        onclick: toggleFollow
+      }, [followLabel()]);
+
+      nodes.rideSoundBtn = h('button', {
+        class: 'iconbtn iconbtn--compact', type: 'button',
+        'aria-pressed': String(local.rideSound),
+        onclick: toggleSound
+      }, [local.rideSound ? 'Sound on' : 'Sound off']);
+
+      wrap.appendChild(h('div', { class: 'ride__row ride__row--wrap' }, [
+        nodes.rideSpeed, nodes.rideFollowBtn, nodes.rideSoundBtn
+      ]));
+
+      wrap.appendChild(h('p', { class: 'lede ride__note' }, [
+        `${ride.fences.length} fences · ${Math.round(ride.lengthM)}m · `
+        + `time allowed ${check.timing.text} at ${ride.speedMpm} m/min. `
+        + 'The line is the app’s suggestion at your pony’s turning radius — ride your own.'
+      ]));
+      return wrap;
+    }
+
+    function playLabel() {
+      if (!ridePlay) return 'Ride';
+      if (ridePlay.driver.playing) return '❙❙ Pause';
+      return ridePlay.driver.finished ? '↻ Ride it again' : '▶ Ride';
+    }
+
+    /* Only the bits that change on their own get touched here. Rebuilding the
+       whole panel would take the scrub bar out from under her finger. */
+    function refreshRideControls() {
+      if (!ridePlay) return;
+      if (nodes.ridePlayBtn) {
+        clear(nodes.ridePlayBtn);
+        nodes.ridePlayBtn.appendChild(document.createTextNode(playLabel()));
+        nodes.ridePlayBtn.setAttribute('aria-pressed', String(ridePlay.driver.playing));
+      }
+      if (nodes.rideSpeed) {
+        for (const btn of nodes.rideSpeed.children) {
+          btn.setAttribute('aria-pressed', String(btn.textContent === rateLabel(local.rideRate)));
+        }
+      }
+      if (nodes.rideFollowBtn) {
+        nodes.rideFollowBtn.setAttribute('aria-pressed', String(local.rideFollow));
+        clear(nodes.rideFollowBtn);
+        nodes.rideFollowBtn.appendChild(document.createTextNode(followLabel()));
+      }
+      if (nodes.rideSoundBtn) {
+        nodes.rideSoundBtn.setAttribute('aria-pressed', String(local.rideSound));
+        clear(nodes.rideSoundBtn);
+        nodes.rideSoundBtn.appendChild(document.createTextNode(local.rideSound ? 'Sound on' : 'Sound off'));
+      }
+    }
+
+    /* Both toggles keep a label the same length whichever way they are set, so
+       the row cannot reflow under her thumb and move the button she is aiming at. */
+    function followLabel() { return local.rideFollow ? 'Zoom out' : 'Zoom in'; }
+
+    function rateLabel(rate) {
+      return rate === 0.5 ? '½×' : (rate === 0.75 ? '¾×' : '1×');
+    }
+
+    function rideClockText() {
+      if (!ridePlay) return '';
+      const st = ridePlay.rideState;
+      return `${st.elapsedS.toFixed(1)}s / ${ridePlay.ride.timeAllowedS}s`;
+    }
+
+    /* -- the controls' handlers -- */
+    function togglePlay() {
+      if (!ridePlay) return;
+      const d = ridePlay.driver;
+      if (d.playing) {
+        d.pause();
+        ridePlay.metro.cancel();
+      } else {
+        /* The sound is started from inside the tap, because iOS will not let a
+           page make a noise any other way. */
+        if (local.rideSound) ridePlay.metro.enable();
+        d.play(now());
+        scheduleBeats();
+        startRideLoop();
+      }
+      refreshRideControls();
+      paintRide();
+    }
+
+    function stepFence(direction) {
+      if (!ridePlay) return;
+      const d = ridePlay.driver;
+      ridePlay.metro.cancel();
+      d.stepTo(direction > 0 ? d.nextFenceS() : d.prevFenceS(), now(), 700);
+      startRideLoop();
+      refreshRideControls();
+    }
+
+    function scrubTo(metres) {
+      if (!ridePlay) return;
+      ridePlay.driver.seek(metres, now());
+      scheduleBeats();
+      if (!ridePlay.raf) { ridePlay.rideState = Ride.rideStateAt(ridePlay.ride, ridePlay.driver.s); paintRide(); }
+    }
+
+    function setRideRate(rate) {
+      local.rideRate = rate;
+      if (ridePlay) {
+        ridePlay.driver.setRate(rate, now());
+        scheduleBeats();
+      }
+      refreshRideControls();
+    }
+
+    function toggleFollow() {
+      local.rideFollow = !local.rideFollow;
+      if (!local.rideFollow) local.view = null;
+      refreshRideControls();
+      redraw();
+      if (local.rideFollow) paintRide();
+    }
+
+    function toggleSound() {
+      local.rideSound = !local.rideSound;
+      if (!ridePlay) { refreshRideControls(); return; }
+      if (local.rideSound) {
+        if (!ridePlay.metro.enable()) {
+          local.rideSound = false;
+          toast('This browser will not make a sound for the app.');
+        } else {
+          scheduleBeats();
+          announce('Sound on. A click on every stride.');
+        }
+      } else {
+        ridePlay.metro.disable();
+      }
+      refreshRideControls();
+    }
+
+    /* Every beat still to come is laid out on the audio clock at once. Firing
+       them frame by frame would wobble, and a wobbly metronome is worse than
+       none. Anything that changes when the beats fall — play, scrub, speed —
+       lays them out again. */
+    function scheduleBeats() {
+      if (!ridePlay || !local.rideSound) return;
+      if (!ridePlay.driver.playing) { ridePlay.metro.cancel(); return; }
+      ridePlay.metro.schedule(ridePlay.ride, ridePlay.driver.s, ridePlay.driver.rate);
+    }
+
+    /* -- the loop -- */
+    function startRideLoop() {
+      if (!ridePlay || ridePlay.raf) return;
+      ridePlay.raf = requestAnimationFrame(rideFrame);
+    }
+
+    function rideFrame(stamp) {
+      if (!ridePlay) return;
+      const d = ridePlay.driver;
+      d.tick(stamp);
+      ridePlay.rideState = Ride.rideStateAt(ridePlay.ride, d.s);
+      paintRide();
+      if (d.playing || d.stepping) {
+        ridePlay.raf = requestAnimationFrame(rideFrame);
+      } else {
+        ridePlay.raf = 0;
+        ridePlay.metro.cancel();
+        refreshRideControls();
+        announce(ridePlay.rideState.caption);
+      }
+    }
+
+    /* One transform, one dash offset and a few rings — never a redraw. Sixty
+       rebuilds of the arena a second would stutter, for the same reason a drag
+       does not rebuild it either. */
+    function paintRide() {
+      if (!ridePlay || !svg) return;
+      const st = ridePlay.rideState;
+      if (!Render.updateRideLayer(svg, ridePlay.ride, st, dark())) { redraw(); return; }
+      followMarker(st);
+      if (nodes.rideCaption) nodes.rideCaption.textContent = st.caption;
+      if (nodes.rideScrubText) nodes.rideScrubText.textContent = rideClockText();
+      if (nodes.rideScrub && !ridePlay.scrubbing && document.activeElement !== nodes.rideScrub) {
+        nodes.rideScrub.value = String(round2(st.s));
+      }
+    }
+
+    /* Zoom that follows her round. The viewBox is set straight on the element
+       rather than through a redraw: it is one attribute, and this runs every
+       frame. */
+    function followMarker(st) {
+      if (!local.rideFollow) return;
+      const a = course.arena, pad = 3;
+      const w = Math.min(ZOOM_WINDOW_M, a.widthM + pad * 2);
+      const hgt = Math.min(ZOOM_WINDOW_M, a.lengthM + pad * 2);
+      const view = {
+        x: clampSpan(st.x - w / 2, -pad, a.widthM + pad - w),
+        y: clampSpan(st.y - hgt / 2, -pad, a.lengthM + pad - hgt),
+        w, h: hgt
+      };
+      local.view = view;
+      svg.setAttribute('viewBox', `${round2(view.x)} ${round2(view.y)} ${round2(view.w)} ${round2(view.h)}`);
+    }
+
+    /* If the window is wider than the arena there is nothing to clamp to, so it
+       simply stays centred rather than being pinned to a nonsensical edge. */
+    function clampSpan(v, lo, hi) {
+      if (hi <= lo) return (lo + hi) / 2;
+      return v < lo ? lo : (v > hi ? hi : v);
+    }
+
     /* ---- changing the course --------------------------------------------- */
     function addJump(type) {
       const arena = course.arena;
@@ -688,6 +1037,15 @@
     /* ---- keyboard, so it works on a laptop too --------------------------- */
     function onKey(ev) {
       if (ev.target && /input|select|textarea/i.test(ev.target.tagName)) return;
+
+      /* Riding has its own keys: space to start and stop, arrows to step from
+         fence to fence, which is what a laptop hand reaches for. */
+      if (local.mode === 'ride' && ridePlay) {
+        if (ev.key === ' ' || ev.key === 'Spacebar') { ev.preventDefault(); togglePlay(); return; }
+        if (ev.key === 'ArrowRight') { ev.preventDefault(); stepFence(1); return; }
+        if (ev.key === 'ArrowLeft') { ev.preventDefault(); stepFence(-1); return; }
+      }
+
       const jump = local.selectedId ? findJump(local.selectedId) : null;
       const step = ev.shiftKey ? 1 : 0.25;
       const nudge = (dx, dy) => {

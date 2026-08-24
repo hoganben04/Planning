@@ -35,6 +35,12 @@ and the install steps. Bea’s own courses are behind the app link above.
   course needs more wings or poles than you have, and lists what to carry out.
 - **Number the fences to set the route.** Numbering *is* the route. Two fences a
   stride apart automatically become one obstacle, lettered A and B.
+- **Ride it before you ride it.** Tap Ride and the route plays out along the
+  line you would take, at the speed of the class, with the leg and the stride
+  count written out as it goes — so a course can be learnt indoors. Play it
+  through, step fence to fence with Next and Back, drag the bar to any point,
+  slow it to a half or three-quarter speed, zoom in and follow it round, and
+  turn on a quiet click for every stride so the rhythm is audible.
 - **Pole work too.** Ground poles, placing poles, trotting poles and bounces,
   with the spacings for your pony’s size.
 - **Print, send or share.** A course sheet with the plan, every distance and the
@@ -92,6 +98,32 @@ getaway, and a proper turn in between at your horse’s turning radius. That is
 also what makes the course length — and so the time allowed — a figure a horse
 could actually achieve.
 
+## Riding a course
+
+Ride mode is one number — how far round she is — turned into a picture. The
+check has already worked out the ridden line as a polyline in metres and each
+fence's exact distance along it, so everything shown while riding (which leg,
+which stride of it, which fences are behind her, the elapsed time) is derived
+from that single distance. All of it lives in `app/lib/ride.js` with no reference
+to the DOM, which is why it can be tested with fabricated timestamps rather than
+by watching an animation and hoping.
+
+Two details worth knowing:
+
+- **The clicks are scheduled ahead, not fired frame by frame.** The speed is
+  constant, so the moment of every stride is known as soon as she presses play.
+  They are laid out against the Web Audio clock in one go and re-laid whenever
+  something changes when they fall — play, scrub or speed. Driving a metronome
+  from `requestAnimationFrame` would wobble, which rather defeats the point.
+- **iOS silences Web Audio when the physical mute switch is on**, and a web page
+  has no way to detect that. If the clicks are on and there is no sound, check
+  the switch on the side of the phone. The button reports the app's own setting
+  and makes no claim about the phone's.
+
+The line she is shown is the app's suggestion: a straight approach, a straight
+getaway and a proper turn between at her pony's turning radius. It is a sensible
+line, not necessarily the one she would choose, and the panel says so.
+
 ## About the heights and speeds — please read
 
 **Check your class schedule before you trust a height.** The machine that built
@@ -146,6 +178,7 @@ app/
     strides.js          THE DISTANCE ENGINE                            (pure)
     route.js            the ridden line, course length, time allowed    (pure)
     course.js           the course model, numbering, whole-course checks (pure)
+    ride.js             riding it back: where she is, when, and the beats (pure)
     store.js            state, saving, undo, import and export
     render.js           course -> SVG
     interact.js         pointer handling: drag, rotate, pinch, snap
@@ -165,7 +198,7 @@ anywhere in the drawing code and zooming is a change of `viewBox`. Colours are
 passed to the renderer as plain hex rather than read from CSS, because a
 serialised SVG has no stylesheet and a PNG export would otherwise come out blank.
 
-`geometry`, `turns`, `strides`, `route` and `course` never touch the DOM, which is
+`geometry`, `turns`, `strides`, `route`, `course` and `ride` never touch the DOM, which is
 what lets the maths be tested in plain Node.
 
 ### Running it
@@ -191,7 +224,11 @@ service worker precache lists every file that ships.
 
 `npm run test:e2e` — real pointer drags through the DevTools protocol rather than
 synthesised mouse events, snapping, the check panel, numbering, sharing, printing,
-and that the app still works with the network switched off.
+and that the app still works with the network switched off. Ride mode is checked
+in the browser for the things only a browser can get wrong: that the marker
+moves, that it only moves forward, that pause means pause, that it stops at the
+finish, that stepping and scrubbing land where they should, and that the arena
+cannot be dragged about underneath the animation.
 
 ### What could not be tested here
 
@@ -203,6 +240,8 @@ iPhone. So these need trying on a real device:
 - Print, and pinching the preview into a PDF
 - Add to Home Screen, the icon, and the full-screen launch
 - the notch and home-indicator insets
+- the stride clicks: whether they are loud enough over an arena, and the mute
+  switch behaviour described above
 
 ### The photo on the landing page
 

@@ -166,6 +166,10 @@
       if (!ev.isPrimary && pointers.size === 0) return;
       const state = cfg.getState();
       if (!state || !state.course) return;
+      /* While she is riding the animation owns the arena. A drag or a pan here
+         would fight it — the marker would be moved by one and the fence by the
+         other on the same frame. */
+      if (state.mode === 'ride') return;
 
       pointers.set(ev.pointerId, {
         startClient: { x: ev.clientX, y: ev.clientY },
@@ -353,7 +357,7 @@
 
     function onWheel(ev) {
       const state = cfg.getState();
-      if (!state) return;
+      if (!state || state.mode === 'ride') return;
       ev.preventDefault();
       const view = currentView(state);
       const at = toArena(ev.clientX, ev.clientY);

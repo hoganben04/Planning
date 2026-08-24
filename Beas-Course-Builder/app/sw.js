@@ -8,7 +8,7 @@
    offline bug is adding a file, forgetting this list, and everything working
    perfectly until someone is somewhere without a signal. */
 
-const VERSION = '2026-08-24-3';
+const VERSION = '2026-08-24-4';
 /* `bcb` is the app’s old misspelled initials. Left alone on purpose — see the
    note on the storage keys in lib/store.js. */
 const CACHE = 'bcb-' + VERSION;
@@ -32,6 +32,7 @@ const PRECACHE = [
   './lib/store.js',
   './lib/render.js',
   './lib/interact.js',
+  './lib/ride.js',
   './lib/share.js',
   './lib/photo.js',
   './lib/ui.js',

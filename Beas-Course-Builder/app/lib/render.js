@@ -39,7 +39,8 @@
       groundPole: '#9AA3AD', placingPole: '#C79A2E',
       ok: '#1F8A4C', note: '#8A6A46', warn: '#C9781B', error: '#C7362F',
       bubble: '#1A2229', bubbleText: '#FFFFFF',
-      halo: '#7C5CD3'
+      halo: '#7C5CD3',
+      rider: '#243B7A', riderEdge: '#FFFFFF', ridden: '#D6337E'
     },
     dark: {
       surround: '#0F1418', arena: '#2E2519', arenaEdge: '#8A6A46',
@@ -53,7 +54,8 @@
       groundPole: '#8892A0', placingPole: '#D9B054',
       ok: '#43C97B', note: '#C0A070', warn: '#F0A44C', error: '#FF6B62',
       bubble: '#E8EDF2', bubbleText: '#141A20',
-      halo: '#A38CF0'
+      halo: '#A38CF0',
+      rider: '#BFD2FF', riderEdge: '#0B0F13', ridden: '#FF5CA0'
     }
   };
 
@@ -113,6 +115,9 @@
         svg.appendChild(measureLayer(check, theme, state, pxPerM));
       }
       svg.appendChild(jumpLayer(course, check, theme, state, grab));
+      if (state.ride && state.rideState) {
+        svg.appendChild(rideLayer(state.ride, state.rideState, theme));
+      }
       svg.appendChild(uiLayer(course, theme, state, pxPerM));
       return { view, pxPerM };
     }
@@ -211,16 +216,22 @@
     const route = check.route;
     if (!route || !route.points || route.points.length < 2) return g;
 
+    /* During a ride this is the track still to come, so it is drawn back a
+       little: the part she has covered is painted over the top of it and the two
+       need to be told apart at a glance. */
+    const riding = !!state.ride;
     g.appendChild(el('path', {
       d: pathFrom(route.points), fill: 'none',
       stroke: theme.trackSoft, 'stroke-width': 0.7,
-      'stroke-linecap': 'round', 'stroke-linejoin': 'round', opacity: 0.85
+      'stroke-linecap': 'round', 'stroke-linejoin': 'round',
+      opacity: riding ? 0.5 : 0.85
     }));
     g.appendChild(el('path', {
       d: pathFrom(route.points), fill: 'none',
       stroke: theme.track, 'stroke-width': 0.16,
       'stroke-linecap': 'round', 'stroke-linejoin': 'round',
-      'stroke-dasharray': '1.6 0.9'
+      'stroke-dasharray': '1.6 0.9',
+      opacity: riding ? 0.55 : 1
     }));
 
     for (const m of R.directionMarks(route.points, 9)) {
@@ -600,6 +611,93 @@
     old.parentNode.replaceChild(next, old);
   }
 
+  /* ---- Riding it -----------------------------------------------------------
+     Two pieces: the part of the track she has already covered, drawn solid over
+     the faint dashed line, and the marker itself.
+
+     The covered part is one path of the whole track with `pathLength` declared as
+     the route's length in metres. That makes the dash units metres too, so the
+     progress line is simply a dash as long as she has ridden — no conversion, and
+     it cannot drift out of step with the arithmetic that drives the ride. */
+  function rideLayer(ride, rideState, theme) {
+    const g = el('g', { 'data-layer': 'ride', 'aria-hidden': 'true' });
+    if (!ride || !ride.points || ride.points.length < 2) return g;
+    const L = ride.lengthM || G.polylineLength(ride.points);
+    const d = pathFrom(ride.points);
+
+    g.appendChild(el('path', {
+      'data-ride': 'covered',
+      d, fill: 'none', stroke: theme.ridden, 'stroke-width': 0.34,
+      'stroke-linecap': 'round', 'stroke-linejoin': 'round',
+      pathLength: n1(L),
+      'stroke-dasharray': `${n1(L)} ${n1(L)}`,
+      'stroke-dashoffset': n1(L - (rideState.s || 0)),
+      opacity: 0.95
+    }));
+
+    /* A ring round each fence, filled in as she jumps it, so the picture keeps a
+       record of the round rather than only showing where she is this instant. */
+    for (const f of ride.fences) {
+      const done = rideState.jumpedIds.indexOf(f.id) >= 0;
+      g.appendChild(el('circle', {
+        'data-ride-fence': f.id,
+        cx: n1(f.x), cy: n1(f.y), r: 1.35,
+        fill: done ? theme.ridden : 'none',
+        'fill-opacity': done ? 0.18 : 0,
+        stroke: theme.ridden, 'stroke-width': done ? 0.16 : 0.08,
+        opacity: done ? 0.95 : 0.35
+      }));
+    }
+
+    g.appendChild(riderMarker(rideState, theme));
+    return g;
+  }
+
+  /* Drawn nose along +x, because a bearing of 0 is +x and SVG rotates clockwise
+     with y downward — so `rotate(angle)` alone points it the way she is going. */
+  function riderMarker(rideState, theme) {
+    const g = el('g', {
+      'data-ride': 'marker',
+      transform: `translate(${n1(rideState.x)} ${n1(rideState.y)}) rotate(${n1(rideState.angle)})`
+    });
+    g.appendChild(el('circle', { r: 1.5, fill: theme.rider, opacity: 0.16 }));
+    g.appendChild(el('path', {
+      d: 'M1.15 0 L-0.75 0.72 L-0.36 0 L-0.75 -0.72 Z',
+      fill: theme.rider, stroke: theme.riderEdge, 'stroke-width': 0.09,
+      'stroke-linejoin': 'round'
+    }));
+    return g;
+  }
+
+  /* Patch the ride layer in place. Sixty redraws a second of the whole arena
+     would stutter on a phone, and for the same reason a drag does not redraw it:
+     the only things that change between frames are one dash offset, one transform
+     and a handful of rings. */
+  function updateRideLayer(svg, ride, rideState, dark) {
+    const layer = svg.querySelector('[data-layer="ride"]');
+    if (!layer) return false;
+    const theme = THEMES[dark ? 'dark' : 'light'];
+    const L = ride.lengthM || 0;
+
+    const covered = layer.querySelector('[data-ride="covered"]');
+    if (covered) covered.setAttribute('stroke-dashoffset', n1(Math.max(L - (rideState.s || 0), 0)));
+
+    const marker = layer.querySelector('[data-ride="marker"]');
+    if (marker) {
+      marker.setAttribute('transform',
+        `translate(${n1(rideState.x)} ${n1(rideState.y)}) rotate(${n1(rideState.angle)})`);
+    }
+
+    for (const ring of layer.querySelectorAll('[data-ride-fence]')) {
+      const done = rideState.jumpedIds.indexOf(ring.getAttribute('data-ride-fence')) >= 0;
+      ring.setAttribute('fill', done ? theme.ridden : 'none');
+      ring.setAttribute('fill-opacity', done ? 0.18 : 0);
+      ring.setAttribute('stroke-width', done ? 0.16 : 0.08);
+      ring.setAttribute('opacity', done ? 0.95 : 0.35);
+    }
+    return true;
+  }
+
   /* ---- Turning the arena into a standalone picture ------------------------ */
   /* Everything is already drawn with explicit colours and a system font stack,
      so this is really just a copy with a background and a caption added. */
@@ -610,8 +708,9 @@
     clone.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');
     clone.setAttribute('width', o.width || 1600);
     clone.setAttribute('height', o.height || 1000);
-    /* Handles and hit pads are no use in a picture. */
-    for (const node of [...clone.querySelectorAll('[data-layer="ui"], .jump__hit')]) {
+    /* Handles, hit pads and the ride marker are no use in a picture: a shared
+       plan should show the course, not where she happened to have got to. */
+    for (const node of [...clone.querySelectorAll('[data-layer="ui"], [data-layer="ride"], .jump__hit')]) {
       node.parentNode.removeChild(node);
     }
     for (const node of [...clone.querySelectorAll('[tabindex]')]) {
@@ -623,8 +722,8 @@
 
   return {
     bcbRender: {
-      createRenderer, THEMES, standaloneSvg, refreshUiLayer, el, glyph, systemFont, pathFrom,
-      pixelsPerMetre, describeForScreenReader
+      createRenderer, THEMES, standaloneSvg, refreshUiLayer, updateRideLayer,
+      el, glyph, systemFont, pathFrom, pixelsPerMetre, describeForScreenReader
     }
   };
 });

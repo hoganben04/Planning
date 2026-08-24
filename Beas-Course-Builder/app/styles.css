@@ -162,6 +162,7 @@ a { color: var(--accent); }
   padding: 0 13px;
 }
 .iconbtn--compact { min-width: 34px; padding: 0 6px; font-size: 14px; flex: none; }
+.iconbtn[aria-pressed="true"] { background: var(--accent-soft); color: var(--ink); font-weight: 650; }
 
 /* ---------- The scrolling body of a screen ---------- */
 .view {
@@ -367,6 +368,35 @@ textarea { min-height: 74px; resize: vertical; }
 }
 .sheetpanel__grip span { width: 38px; height: 4px; border-radius: 999px; background: var(--line); }
 .sheetpanel__body { overflow-y: auto; min-width: 0; padding: 0 12px 12px; -webkit-overflow-scrolling: touch; }
+
+/* ---------- Ride ----------
+   Three short rows, so the controls fit the panel at a peek and the arena keeps
+   the screen — which is rather the point of watching a ride. */
+.ride { display: grid; gap: 8px; padding-top: 2px; }
+.ride__row { display: flex; align-items: center; gap: 8px; }
+.ride__row--wrap { flex-wrap: wrap; }
+/* The speed picker takes its own width rather than stretching, so the two
+   toggles beside it stay on the same row. */
+.ride__row .seg { flex: 0 1 auto; min-width: 0; }
+.ride__play {
+  flex: 1; min-height: 46px; border: 0; border-radius: 12px;
+  background: var(--accent); color: var(--accent-ink);
+  font-size: 16px; font-weight: 700; cursor: pointer;
+  font-variant-numeric: tabular-nums;
+}
+.ride__play:active { transform: translateY(1px); }
+.ride__scrub {
+  flex: 1; min-width: 0; height: 34px; accent-color: var(--accent);
+  /* The arena swallows touches, but the scrub bar must not. */
+  touch-action: pan-x;
+}
+.ride__clock {
+  flex: none; font-size: 12.5px; font-weight: 600; color: var(--muted);
+  font-variant-numeric: tabular-nums; min-width: 88px; text-align: right;
+}
+.ride__note { font-size: 12.5px; margin: 0; }
+/* The same figures in the floating readout, where there is far less room. */
+.ride__time { font-weight: 500; color: var(--muted); font-variant-numeric: tabular-nums; }
 
 .palette { display: flex; gap: 8px; overflow-x: auto; padding: 2px 0 6px; -webkit-overflow-scrolling: touch; }
 .palette::-webkit-scrollbar { height: 0; }
