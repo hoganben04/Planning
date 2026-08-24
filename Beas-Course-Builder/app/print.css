@@ -1,0 +1,78 @@
+/* Bea's Course Builder — the course sheet.
+
+   On an iPhone: Share, then Print, then pinch the preview to save it as a PDF.
+
+   iOS Safari largely ignores @page margins and applies its own, so nothing here
+   depends on them: the sheet carries its own padding and caps its width in
+   millimetres. And Safari drops background colours in print unless
+   print-color-adjust says otherwise, which would lose the sand and the poles. */
+
+@page { size: A4 portrait; margin: 10mm; }
+
+.app, .toasts, .modal { display: none !important; }
+
+.sheet {
+  display: block !important;
+  padding: 6mm;
+  max-width: 190mm;
+  margin: 0 auto;
+  color: #111;
+  background: #fff;
+  font: 11pt/1.4 -apple-system, system-ui, "Segoe UI", Roboto, sans-serif;
+}
+.sheet, .sheet * {
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.sheet__head {
+  display: flex; justify-content: space-between; align-items: flex-end;
+  gap: 8mm; border-bottom: 1.2pt solid #111; padding-bottom: 3mm; margin-bottom: 4mm;
+}
+.sheet__title { font-size: 19pt; font-weight: 700; letter-spacing: -.01em; }
+.sheet__sub { font-size: 10pt; color: #444; }
+.sheet__facts { text-align: right; font-size: 10pt; }
+.sheet__facts b { font-size: 13pt; }
+
+/* The plan beside the tables. A tall arena at full page width would be over
+   400mm high, so it gets its own narrow column and the numbers sit next to it. */
+.sheet__body { display: grid; grid-template-columns: auto 1fr; gap: 6mm; align-items: start; }
+.sheet__diagram { break-inside: avoid; page-break-inside: avoid; border: .5pt solid #ccc; border-radius: 1.5mm; padding: 1mm; }
+.sheet__diagram svg { display: block; }
+.sheet__tables { min-width: 0; }
+.sheet__tables h2:first-child { margin-top: 0; }
+
+/* A wide arena is the other way round: it reads better across the page with the
+   tables underneath. */
+@media print {
+  .sheet[data-arena="wide"] .sheet__body { grid-template-columns: 1fr; }
+}
+
+.sheet h2 { font-size: 12pt; margin: 5mm 0 2mm; }
+
+.sheet table { width: 100%; border-collapse: collapse; font-size: 9.6pt; }
+.sheet thead { display: table-header-group; }
+.sheet th, .sheet td {
+  text-align: left; padding: 1.6mm 2mm; border-bottom: .5pt solid #bbb;
+  vertical-align: top;
+}
+.sheet th { font-size: 8pt; text-transform: uppercase; letter-spacing: .05em; color: #444; }
+.sheet tr { break-inside: avoid; page-break-inside: avoid; }
+.sheet td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.sheet .verdict-ok::before { content: "\2713  "; }
+.sheet .verdict-note::before { content: "\007E  "; }
+.sheet .verdict-warn::before { content: "\0021  "; }
+.sheet .verdict-error::before { content: "\2717  "; }
+
+.sheet__notes {
+  margin-top: 5mm; border: .5pt solid #999; border-radius: 2mm; padding: 3mm;
+  min-height: 18mm; font-size: 9.6pt;
+}
+.sheet__foot {
+  margin-top: 5mm; padding-top: 2mm; border-top: .5pt solid #bbb;
+  font-size: 8pt; color: #555;
+}
+
+/* Mono by default, so a home printer produces something usable and it
+   photocopies. The colour version is opt-in from the share sheet. */
+.sheet[data-print="mono"] .swatch { display: none; }

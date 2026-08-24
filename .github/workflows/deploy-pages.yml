@@ -2,7 +2,7 @@ name: Deploy static apps to GitHub Pages
 
 # One Pages site, two apps:
 #   /                 -> Farm-Safety-Training-Pack/app  (unchanged URL)
-#   /course-builder/  -> Bees-Course-Builder/app
+#   /course-builder/  -> Beas-Course-Builder/app
 #
 # A repository gets exactly ONE Pages site, and each deployment replaces the whole
 # of it. So both apps have to be assembled into a single artifact here — adding a
@@ -16,7 +16,7 @@ on:
       - claude/horse-jumping-planner-ios-0ngx5z
     paths:
       - "Farm-Safety-Training-Pack/app/**"
-      - "Bees-Course-Builder/app/**"
+      - "Beas-Course-Builder/app/**"
       - ".github/workflows/deploy-pages.yml"
   workflow_dispatch:
 
@@ -53,7 +53,7 @@ jobs:
           mkdir -p _site/course-builder
           # The trailing "/." copies dotfiles too, so .nojekyll comes along.
           cp -R Farm-Safety-Training-Pack/app/. _site/
-          cp -R Bees-Course-Builder/app/. _site/course-builder/
+          cp -R Beas-Course-Builder/app/. _site/course-builder/
           touch _site/.nojekyll _site/course-builder/.nojekyll
           echo "--- site tree ---"
           find _site -maxdepth 2 -printf '%P\n' | sort
