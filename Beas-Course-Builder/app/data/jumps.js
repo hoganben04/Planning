@@ -10,7 +10,7 @@
    measured distance rides differently from an upright.
 
    FEI note: a descending oxer (front pole higher than the back) is prohibited
-   because it deceives the horse's eye, so it is deliberately not offered here. */
+   because it deceives the horse’s eye, so it is deliberately not offered here. */
 (function (root, factory) {
   const api = factory();
   if (typeof module === 'object' && module.exports) module.exports = api;

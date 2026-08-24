@@ -10,7 +10,7 @@
    Fields:
      heightCm      first-round fence height for the class
      maxHeightCm   the highest a fence may be built (second-round singles, or
-                   the course builder's leeway) — null when it is just heightCm
+                   the course builder’s leeway) — null when it is just heightCm
      spreadCm      widest spread for an oxer at this level
      tripleBarCm   widest spread for a triple bar (wider than an oxer)
      speedMpm      metres per minute, used to work out the time allowed

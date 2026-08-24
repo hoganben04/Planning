@@ -6,7 +6,7 @@
    distances printed beside it.
 
    Saved in localStorage. A web app added to the iPhone home screen is exempt
-   from Safari's habit of clearing storage after a week of not being used, which
+   from Safari’s habit of clearing storage after a week of not being used, which
    is the honest reason the app nags her to install it — but there is a rolling
    backup key and a JSON export as well, because losing her courses would be
    unforgivable. */
@@ -25,7 +25,7 @@
      live, so changing one strands everything already saved on the phone and the
      app opens empty.
 
-     The `bcb` prefix is short for the app's old, misspelled name ("Bee’s" rather
+     The `bcb` prefix is short for the app’s old, misspelled name ("Bee’s" rather
      than "Bea’s"). It stays deliberately: the spelling in front of her is what
      matters, and no amount of internal tidiness is worth losing a saved course
      over. tests/precache.test.js pins these three strings so a future rename
@@ -85,7 +85,7 @@
 
   /* Bring an older save up to date. If we ever meet data written by a NEWER
      version of the app than this one, we refuse rather than write over it —
-     that is how a cached old copy of a web app eats somebody's work. */
+     that is how a cached old copy of a web app eats somebody’s work. */
   function migrate(raw) {
     if (!raw || typeof raw !== 'object') return { db: blankDb(), fresh: true };
     if (raw.schemaVersion > SCHEMA) {
@@ -389,7 +389,7 @@
 
     /* A real PC80 round: down the left, round the bottom, back up the right
        through a double. The positions are chosen so every distance comes out
-       true for a 14.2hh pony's 3.2m stride, so she can see what the app is for
+       true for a 14.2hh pony’s 3.2m stride, so she can see what the app is for
        before changing anything. */
     const course = store.addCourse({
       name: 'First course', levelId: 'pc80', horseId: pony.id,

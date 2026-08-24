@@ -15,8 +15,8 @@
 <meta property="og:description" content="Plan show jumping courses to scale, with the distances worked out for your own pony." />
 <meta property="og:image" content="./images/shot-editor.png" />
 
-<!-- Styles live in this file rather than in the app's stylesheet: this is one
-     page for showing people, and it should not have to fight the app's layout. -->
+<!-- Styles live in this file rather than in the app’s stylesheet: this is one
+     page for showing people, and it should not have to fight the app’s layout. -->
 <style>
   :root {
     --paper:#fff; --panel:#F7F5F0; --line:#E3DED3; --ink:#1A2229; --muted:#5E6C79;
@@ -53,14 +53,22 @@
   @media (min-width:760px) { .hero__grid { grid-template-columns:1.1fr .9fr; gap:40px; } }
 
   .hero__media {
-    position:relative; aspect-ratio:4/3; border-radius:var(--radius);
+    position:relative; aspect-ratio:4/5; border-radius:var(--radius);
     overflow:hidden; background:var(--sand);
     border:1px solid var(--line); box-shadow:var(--shadow);
   }
+  /* On a wide screen it sits beside the text, where a tall picture would
+     unbalance the row, so it squares up. */
+  @media (min-width:760px) { .hero__media { aspect-ratio:4/3; } }
   /* Drop a picture in at images/hero.jpg and it takes over from the drawing
      below. If the file is not there the img removes itself and the drawing shows,
      so the page looks finished either way. */
-  .hero__photo { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:1; }
+  /* object-position keeps his eye and his nose in frame when the box crops the
+     picture, rather than slicing through the middle of his face. */
+  .hero__photo {
+    position:absolute; inset:0; width:100%; height:100%;
+    object-fit:cover; object-position:center 42%; z-index:1;
+  }
   .hero__art { position:absolute; inset:0; width:100%; height:100%; }
 
   .badge {
@@ -130,7 +138,7 @@
       <h1 style="margin:16px 0 10px">Bea’s Course Builder</h1>
       <p class="lede">
         Plan show jumping courses and pole work to scale, with every distance
-        worked out for <em>your</em> pony's stride — not a horse's.
+        worked out for <em>your</em> pony’s stride — not a horse’s.
       </p>
       <a class="cta" href="./">Open the app <span aria-hidden="true">→</span></a>
       <span class="cta__sub small">
@@ -197,7 +205,7 @@
       <strong>Why a pony needs different distances</strong>
       <code>distance for n strides = (n + 1) × stride length</code>
       A horse striding 12ft gives the familiar 24ft one-stride double. A 14.2hh
-      pony striding 3.2m needs 6.4m — nearly a metre shorter. Set her a horse's
+      pony striding 3.2m needs 6.4m — nearly a metre shorter. Set her a horse’s
       double and she meets the second element wrong. Most planners assume a horse;
       this one asks which pony.
     </div>
@@ -210,17 +218,17 @@
       <div>
         <ul class="points">
           <li><span class="tick" aria-hidden="true">✓</span>
-            <span><strong>Every distance checked</strong> against your pony's own canter stride.</span></li>
+            <span><strong>Every distance checked</strong> against your pony’s own canter stride.</span></li>
           <li><span class="tick" aria-hidden="true">✓</span>
             <span><strong>Awkward distances flagged.</strong> The worst kind is one that falls
             between two stride numbers — too long for three, too short for four. It says so,
             and offers to move the fence.</span></li>
           <li><span class="tick" aria-hidden="true">✓</span>
-            <span><strong>Metres, feet and walking paces.</strong> You'll be pacing these out
-            yourself, so "eleven paces" beats "10.4m" when you're stood in the arena.</span></li>
+            <span><strong>Metres, feet and walking paces.</strong> You’ll be pacing these out
+            yourself, so "eleven paces" beats "10.4m" when you’re stood in the arena.</span></li>
           <li><span class="tick" aria-hidden="true">✓</span>
-            <span><strong>Course length and time allowed,</strong> worked out along the line you'd
-            actually ride, with real turns rather than corners a horse couldn't manage.</span></li>
+            <span><strong>Course length and time allowed,</strong> worked out along the line you’d
+            actually ride, with real turns rather than corners a horse couldn’t manage.</span></li>
         </ul>
       </div>
     </div>
@@ -249,10 +257,10 @@
             double automatically, lettered A and B.</span></li>
           <li><span class="tick" aria-hidden="true">✓</span>
             <span>Pole work too: trotting poles, placing poles and bounces, spaced for
-            your pony's size.</span></li>
+            your pony’s size.</span></li>
           <li><span class="tick" aria-hidden="true">✓</span>
             <span>It knows what jumps you own, and tells you when a course needs more
-            wings or poles than you've got.</span></li>
+            wings or poles than you’ve got.</span></li>
         </ul>
       </div>
     </div>
@@ -277,8 +285,8 @@
   <div class="wrap">
     <h2>Put it on your phone</h2>
     <p class="lede" style="max-width:60ch">
-      There's no App Store listing — it installs straight from Safari, which is why
-      it's free and needs no Apple account.
+      There’s no App Store listing — it installs straight from Safari, which is why
+      it’s free and needs no Apple account.
     </p>
     <ol class="steps">
       <li><span>Open <a href="./">this app</a> in <strong>Safari</strong> on your iPhone or iPad.</span></li>
@@ -286,9 +294,9 @@
       <li><span>Scroll down and tap <kbd>Add to Home Screen</kbd>, then <kbd>Add</kbd>.</span></li>
     </ol>
     <p class="small" style="margin-top:20px">
-      Worth doing rather than just bookmarking it. Safari clears a website's saved
+      Worth doing rather than just bookmarking it. Safari clears a website’s saved
       data after about a week of not visiting, but an app added to the home screen
-      is exempt — so your courses stay put. There's a <strong>Save a backup</strong>
+      is exempt — so your courses stay put. There’s a <strong>Save a backup</strong>
       button in Settings as well.
     </p>
     <p style="margin-top:22px"><a class="cta" href="./">Open the app <span aria-hidden="true">→</span></a></p>
@@ -303,9 +311,9 @@
       unaffiliated heights people actually school over. <strong>Check your class
       schedule before you trust a height:</strong> the fence spreads in the app are
       our own estimates and the speeds are unconfirmed, because the rulebooks
-      couldn't be reached when it was built. Every figure is listed with its source
-      and how much to trust it on the app's Distances screen, along with the things
-      we couldn't establish at all. Walk your distances and check them before you
+      couldn’t be reached when it was built. Every figure is listed with its source
+      and how much to trust it on the app’s Distances screen, along with the things
+      we couldn’t establish at all. Walk your distances and check them before you
       jump.
     </p>
     <p class="small">

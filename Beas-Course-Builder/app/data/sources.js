@@ -7,7 +7,7 @@
    them), so no official rulebook PDF was ever read directly.
 
    confidence:
-     'official'  read from a governing body's own page
+     'official'  read from a governing body’s own page
      'pdf'       extracted from an official PDF via a search summary; the number
                  is probably right but its article and context are unverified
      'secondary' reputable equestrian media, venue or retailer restating a rule

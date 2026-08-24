@@ -1,7 +1,7 @@
 /* Bea’s Course Builder — geometry. Pure maths, no DOM, so the tests can run it
    straight in node.
 
-   COORDINATES. Everything is in metres, measured from the arena's top-left
+   COORDINATES. Everything is in metres, measured from the arena’s top-left
    corner, x to the right and y DOWNWARD — the same way SVG works, so nothing has
    to be flipped when it is drawn. Angles are in degrees, clockwise, and a fence
    at 0 degrees has its poles lying left-to-right and is jumped downward (+y). */
@@ -60,7 +60,7 @@
       halfW: widthM / 2,
       halfD: Math.max(spreadM, 0) / 2,
       rotationDeg,
-      /* unit vectors of the box's own axes, in arena space */
+      /* unit vectors of the box’s own axes, in arena space */
       axisW: rotate({ x: 1, y: 0 }, rotationDeg),
       axisD: rotate({ x: 0, y: 1 }, rotationDeg)
     };
@@ -77,7 +77,7 @@
   }
 
   /* How far from the box centre you leave the box, travelling along `dir`.
-     This is the slab test, done in the box's own frame. It is what makes an
+     This is the slab test, done in the box’s own frame. It is what makes an
      angled fence correctly present more depth than its nominal spread: a 1.1m
      oxer turned 30 degrees to the line of travel is deeper than 1.1m to jump. */
   function rayBoxExit(b, dir) {

@@ -12,7 +12,7 @@
 
    For a 12ft (3.6m) horse stride that gives the familiar 24ft one-stride double.
    For a 14.2hh pony striding 3.2m it gives 6.4m — nearly a metre shorter. Set a
-   pony a horse's double and she meets the second element wrong. That difference
+   pony a horse’s double and she meets the second element wrong. That difference
    is the whole reason this app exists.
 
    Everything is measured as CLEAR distance: from the back rail of one fence to
@@ -40,7 +40,7 @@
 
   /* ---- The horse ------------------------------------------------------------
      A horse profile need only carry a stride length; everything else falls out.
-     If she has measured her pony's take-off and landing, those override. */
+     If she has measured her pony’s take-off and landing, those override. */
   function strideModel(horse) {
     const type = horse && horse.typeId ? horseType(horse.typeId) : null;
     const strideM = (horse && horse.strideM) || (type && type.strideM) || 3.20;
@@ -137,7 +137,7 @@
     const along = pathM != null ? pathM : centreM;
     const clearM = along - backOfA - frontOfB;
 
-    /* How far fence B sits to the side of A's jumping line — the dogleg. */
+    /* How far fence B sits to the side of A’s jumping line — the dogleg. */
     const jumpLineA = G.rotate({ x: 0, y: 1 }, a.rotationDeg || 0);
     const offsetM = G.cross(jumpLineA, G.sub(boxB.centre, boxA.centre));
 

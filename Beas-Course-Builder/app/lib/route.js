@@ -43,9 +43,9 @@
   /* Build a track through the fences.
 
      Each fence gets a straight approach and a straight getaway along its own
-     line, so the horse meets it square. Between one fence's getaway and the
-     next fence's approach we solve a proper arc/straight/arc turn (see
-     turns.js) at the horse's own turning radius. That is what stops the track
+     line, so the horse meets it square. Between one fence’s getaway and the
+     next fence’s approach we solve a proper arc/straight/arc turn (see
+     turns.js) at the horse’s own turning radius. That is what stops the track
      doubling back through an impossible hairpin when two fences face opposite
      ways, and it means the length — and so the time allowed — is one a horse
      could actually achieve. */

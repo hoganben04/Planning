@@ -37,7 +37,7 @@
   const DEFAULT_HORSE_TYPE = 'pony-large';
 
   /* How far off a true distance before it is worth saying something, as a
-     fraction of the horse's own stride. The largest an error can ever be is half
+     fraction of the horse’s own stride. The largest an error can ever be is half
      a stride, so anything past 0.30 really is stuck between two stride numbers. */
   const TOLERANCE = {
     true: 0.06,        /* within this, call it true */

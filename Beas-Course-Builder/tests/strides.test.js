@@ -37,7 +37,7 @@ test('the (n+1) x stride rule reproduces the published tables', () => {
   assert.ok(Math.abs(S.trueDistance(horse, 2) - 10.80) < 0.01, 'two strides 10.8m');
   assert.ok(Math.abs(S.trueDistance(horse, 3) - 14.40) < 0.01, 'three strides 14.4m');
 
-  /* A large pony's distances land inside the ranges wehorse publishes for 148cm. */
+  /* A large pony’s distances land inside the ranges wehorse publishes for 148cm. */
   const pony = S.strideModel(PONY);
   const within = (v, lo, hi) => v >= lo && v <= hi;
   assert.ok(within(S.trueDistance(pony, 1), 5.90, 6.90), 'pony one stride in 5.9-6.9m');

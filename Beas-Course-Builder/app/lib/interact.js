@@ -8,7 +8,7 @@
       screen pixels and divided by the current zoom. So a gesture behaves the same
       whether the whole arena is on screen or she has zoomed into one corner.
 
-   2. While a drag is in flight the fence's transform is written straight onto the
+   2. While a drag is in flight the fence’s transform is written straight onto the
       SVG node and nothing is saved. Only on lifting off does the change go into
       the store. That keeps dragging smooth, and it means a second finger landing
       mid-drag can roll the fence back to where it started instead of smearing it

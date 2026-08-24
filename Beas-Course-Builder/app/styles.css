@@ -1,6 +1,6 @@
 /* Bea’s Course Builder
 
-   Colours live here for the app's own furniture. The arena itself is drawn with
+   Colours live here for the app’s own furniture. The arena itself is drawn with
    explicit colours from render.js, because a serialised SVG has no stylesheet and
    would otherwise export blank.
 

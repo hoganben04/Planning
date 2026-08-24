@@ -28,7 +28,7 @@ and the install steps. Bea’s own courses are behind the app link above.
   the jumps out yourself, and "eleven paces" is more use than "10.4m" when you
   are stood in the arena with a pole under each arm.
 - **Your own horses.** Everything comes from the canter stride length, so a
-  14.2hh pony gets pony distances rather than a horse's. Switch horse and every
+  14.2hh pony gets pony distances rather than a horse’s. Switch horse and every
   distance is worked out again. Each one can have a photo, kept on the phone and
   never uploaded.
 - **Your own jumps.** Tell it what you actually own and it warns you when a
@@ -36,7 +36,7 @@ and the install steps. Bea’s own courses are behind the app link above.
 - **Number the fences to set the route.** Numbering *is* the route. Two fences a
   stride apart automatically become one obstacle, lettered A and B.
 - **Pole work too.** Ground poles, placing poles, trotting poles and bounces,
-  with the spacings for your pony's size.
+  with the spacings for your pony’s size.
 - **Print, send or share.** A course sheet with the plan, every distance and the
   time allowed; a picture to message your instructor; or the whole course packed
   into a link.
@@ -53,7 +53,7 @@ needs no Apple account and costs nothing.
 It now has its own icon and opens full screen like any other app, and works with
 no signal.
 
-Worth doing rather than just bookmarking: Safari clears a website's saved data
+Worth doing rather than just bookmarking: Safari clears a website’s saved data
 after about a week of not visiting it, but a web app added to the home screen is
 exempt. Add it to the home screen and your courses stay put. There is a **Save a
 backup** button in Settings as well, and it is worth using now and then.
@@ -76,7 +76,7 @@ clear distance for n strides  =  (n + 1) x stride length
 
 For a horse striding 12ft that gives the familiar 24ft one-stride double. For a
 14.2hh pony striding 3.2m it gives 6.4m — nearly a metre shorter. Set a pony a
-horse's double and she meets the second element wrong, and this is the mistake the
+horse’s double and she meets the second element wrong, and this is the mistake the
 app exists to catch. Most course-planning tools default to horse distances.
 
 Distances are measured as **clear ground, back rail to front rail, along the line
@@ -84,11 +84,11 @@ you would actually ride** — which is how a distance is walked, and why a wide 
 eats into the gap to the next fence. A fence set at an angle to the line of travel
 correctly counts as deeper than its nominal spread.
 
-The warnings scale with your horse's own stride rather than using fixed
+The warnings scale with your horse’s own stride rather than using fixed
 centimetres, so they are pony-correct without a second set of numbers.
 
 The ridden line is worked out as a straight approach to each fence, a straight
-getaway, and a proper turn in between at your horse's turning radius. That is
+getaway, and a proper turn in between at your horse’s turning radius. That is
 also what makes the course length — and so the time allowed — a figure a horse
 could actually achieve.
 
@@ -177,7 +177,7 @@ npm run test:e2e   # Playwright, iPhone and desktop viewports
 npm run icons      # regenerate the icon PNGs from icon.svg
 ```
 
-The e2e tests need Playwright's Chromium. In this environment it is already
+The e2e tests need Playwright’s Chromium. In this environment it is already
 present — do not run `playwright install`. `node_modules/playwright` is a symlink
 to the global install.
 
@@ -204,25 +204,35 @@ iPhone. So these need trying on a real device:
 - Add to Home Screen, the icon, and the full-screen launch
 - the notch and home-indicator insets
 
-### Putting your own photo on the landing page
+### The photo on the landing page
 
-Drop a picture at `app/images/hero.jpg` and it takes over the top of the landing
-page. There is nothing to switch on: the page asks for that file, and if it is not
-there the `<img>` removes itself and the drawn arena underneath shows instead — so
-the page looks finished either way, and adding the photo needs no code change.
+`app/images/hero.jpg` is Bea’s pony, leaning over the flint wall. A few notes on
+how it got there, because they apply to any replacement:
 
-Two things worth doing when you add one:
+- **It is re-encoded, not copied.** The original off the phone was 3.9MB and
+  carried **GPS coordinates** in its EXIF data — publishing that raw would have
+  put the location it was taken at into a public repository. Rendering it through
+  a canvas strips every EXIF field, so the published file has no GPS, no device
+  and no timestamp. It is 1300x1733 and 246KB.
+- **iPhone photos carry a rotation flag.** This one is stored landscape with an
+  "Orientation = 6" tag, and a browser turns it upright on display. So it must be
+  loaded with `createImageBitmap(blob, { imageOrientation: 'from-image' })` before
+  re-encoding, or the output comes out on its side — the same trap `lib/photo.js`
+  handles for horse photos.
+- **The box adapts to the picture.** It is 4:5 on a phone, where a portrait photo
+  has room, and 4:3 on a wide screen where it sits beside the text.
+  `object-position: center 42%` keeps his eye and his nose in frame when the box
+  crops rather than slicing through the middle of his face.
 
-- **Shrink it first.** Anything over about 400KB makes the page slow on a phone
-  signal. Roughly 1600px on the long edge is plenty.
-- **Fix the alt text.** It currently reads `alt="Bea and her pony"`, which is a
-  guess. Change it in `app/about.html` to describe what the picture actually shows.
+To swap it, put a new `app/images/hero.jpg` in place and update the `alt` text in
+`app/about.html` to describe what the new one shows. If the file is ever missing
+the `<img>` removes itself and a drawn arena shows instead, so the page still
+looks finished.
 
-Horse photos inside the app are a different thing and need no work from you: she
-picks one on the horse's page and `lib/photo.js` crops it square, scales it to
-480px and squeezes it under 120KB before storing it. That matters because the
-browser gives the whole app about 5MB for everything, and one untouched iPhone
-photo would fill it.
+Horse photos inside the app need no work from you: she picks one on the horse’s
+page and `lib/photo.js` crops it square, scales it to 480px and squeezes it under
+120KB before storing it. That matters because the browser gives the whole app
+about 5MB for everything, and one untouched iPhone photo would fill it.
 
 ### Publishing
 
@@ -235,7 +245,7 @@ replaces the whole thing:
 - `/course-builder/about.html` — the landing page
 
 The landing page and its screenshots are deliberately **not** in the service
-worker's precache list: they are large, they are read once over a signal, and they
+worker’s precache list: they are large, they are read once over a signal, and they
 are of no use standing in a field. The worker still caches them on demand if she
 does open the page.
 

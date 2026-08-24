@@ -9,7 +9,7 @@
    perfectly until someone is somewhere without a signal. */
 
 const VERSION = '2026-08-24-3';
-/* `bcb` is the app's old misspelled initials. Left alone on purpose — see the
+/* `bcb` is the app’s old misspelled initials. Left alone on purpose — see the
    note on the storage keys in lib/store.js. */
 const CACHE = 'bcb-' + VERSION;
 

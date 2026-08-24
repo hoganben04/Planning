@@ -1,6 +1,6 @@
 /* Shared helpers for the browser tests.
 
-   Drags go through the Chrome DevTools Protocol rather than Playwright's
+   Drags go through the Chrome DevTools Protocol rather than Playwright’s
    dragTo(), because dragTo synthesises mouse events and the app listens for
    pointer events with capture — which is exactly the code most likely to be
    wrong, so it is the code the tests should exercise. */
