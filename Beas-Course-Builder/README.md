@@ -1,4 +1,4 @@
-# Bea's Course Builder
+# Bea’s Course Builder
 
 Plan show jumping courses and pole work to scale, with the stride distances worked
 out for your own pony.
@@ -12,7 +12,7 @@ see *Putting it on your phone* below.
 
 **[Landing page](https://hoganben04.github.io/Planning/course-builder/about.html)** —
 the page to send to somebody who has never seen it: what it does, screenshots,
-and the install steps. Bea's own courses are behind the app link above.
+and the install steps. Bea’s own courses are behind the app link above.
 
 ## What it does
 

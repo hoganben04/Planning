@@ -1,4 +1,4 @@
-/* Bea's Course Builder — joining one fence to the next.
+/* Bea’s Course Builder — joining one fence to the next.
 
    A course plan is not a wiggly line through the fences. It is a straight
    approach to each fence, a straight getaway from it, and a sweeping turn in

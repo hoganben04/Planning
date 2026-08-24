@@ -1,4 +1,4 @@
-/* Bea's Course Builder — the arena editor.
+/* Bea’s Course Builder — the arena editor.
 
    Three modes, because they are three different jobs and mixing them on a phone
    screen makes both harder:

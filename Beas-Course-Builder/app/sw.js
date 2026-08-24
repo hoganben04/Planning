@@ -1,4 +1,4 @@
-/* Bea's Course Builder — the service worker.
+/* Bea’s Course Builder — the service worker.
 
    Its whole job is to make the app open with no signal, which matters because
    she will be standing in a field with the jumps.
@@ -8,7 +8,7 @@
    offline bug is adding a file, forgetting this list, and everything working
    perfectly until someone is somewhere without a signal. */
 
-const VERSION = '2026-08-24-2';
+const VERSION = '2026-08-24-3';
 /* `bcb` is the app's old misspelled initials. Left alone on purpose — see the
    note on the storage keys in lib/store.js. */
 const CACHE = 'bcb-' + VERSION;

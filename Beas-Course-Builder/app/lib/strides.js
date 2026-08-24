@@ -1,4 +1,4 @@
-/* Bea's Course Builder — the distance engine.
+/* Bea’s Course Builder — the distance engine.
 
    Pure maths, no DOM. This is the part of the app that has to be right, so it is
    written to be read and checked by a person who knows more about horses than

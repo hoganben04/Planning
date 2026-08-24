@@ -1,4 +1,4 @@
-/* Bea's Course Builder — putting it together.
+/* Bea’s Course Builder — putting it together.
 
    A hash router, five screens and the boot sequence. Hash routing rather than the
    History API because it works with no server rewrites, survives being served
@@ -136,7 +136,7 @@
   function screenCourses() {
     renderTabs('courses');
     setChrome({
-      title: "Bea's Course Builder",
+      title: "Bea’s Course Builder",
       actions: [{
         label: '+ New', primary: true, onClick: async () => {
           const name = await askText({
@@ -827,7 +827,7 @@
 
     pad.appendChild(h('h2', {}, ['About']));
     pad.appendChild(h('p', { class: 'lede' }, [
-      "Bea's Course Builder works entirely on your phone. Nothing is uploaded, there is "
+      "Bea’s Course Builder works entirely on your phone. Nothing is uploaded, there is "
       + 'no account, and it works with no signal once you have added it to your home screen.'
     ]));
     pad.appendChild(h('p', { class: 'lede' }, [
@@ -1029,7 +1029,7 @@
       'Distances worked out for a ' + s.strideM + 'm stride, measured back rail to front '
       + 'rail along the track. Walk them and check before you jump. Your class schedule '
       + 'and the current rulebook are the authority on heights and speeds, not this sheet. '
-      + "Made with Bea's Course Builder."
+      + "Made with Bea’s Course Builder."
     ]));
   }
 

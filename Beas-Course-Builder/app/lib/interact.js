@@ -1,4 +1,4 @@
-/* Bea's Course Builder — moving things about with a thumb.
+/* Bea’s Course Builder — moving things about with a thumb.
 
    All input goes through Pointer Events, which is one code path for a finger, an
    Apple Pencil and a mouse. Two rules keep it feeling right on a phone:

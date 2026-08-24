@@ -1,4 +1,4 @@
-/* Bea's Course Builder — getting a course off the phone.
+/* Bea’s Course Builder — getting a course off the phone.
 
    Four ways out, in the order she is likely to want them:
      print   a course sheet she can take to the arena or give her instructor

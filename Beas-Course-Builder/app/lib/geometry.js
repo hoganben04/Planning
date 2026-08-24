@@ -1,4 +1,4 @@
-/* Bea's Course Builder — geometry. Pure maths, no DOM, so the tests can run it
+/* Bea’s Course Builder — geometry. Pure maths, no DOM, so the tests can run it
    straight in node.
 
    COORDINATES. Everything is in metres, measured from the arena's top-left

@@ -1,4 +1,4 @@
-/* Bea's Course Builder — drawing the arena.
+/* Bea’s Course Builder — drawing the arena.
 
    The arena is one SVG whose user units ARE metres, so nothing in here needs a
    scale factor: a fence at 14.5m across the arena is drawn at x="14.5". Zooming

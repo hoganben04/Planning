@@ -136,12 +136,12 @@ test('the landing page points at the app and at pictures that exist', () => {
     'the hero photo must remove itself when the file is absent');
 });
 
-/* These three strings are where Bea's courses actually live in the browser. A
+/* These three strings are where Bea’s courses actually live in the browser. A
    rename would strand everything already saved on her phone and the app would
    open empty, so they are pinned here on purpose.
 
    The `bcb` prefix is short for the app's old misspelled name. It is deliberately
-   NOT being tidied up to match "Bea's" — the spelling she sees is what matters,
+   NOT being tidied up to match "Bea’s" — the spelling she sees is what matters,
    and no internal neatness is worth losing a saved course over. */
 test('the storage keys are not renamed, whatever the app is called', () => {
   const store = fs.readFileSync(path.join(APP, 'lib', 'store.js'), 'utf8');

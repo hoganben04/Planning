@@ -1,7 +1,7 @@
 {
   "id": "./",
-  "name": "Bea's Course Builder",
-  "short_name": "Bea's Courses",
+  "name": "Bea’s Course Builder",
+  "short_name": "Bea’s Courses",
   "description": "Plan show jumping courses and pole work to scale, with the stride distances worked out for your own pony.",
   "start_url": "./",
   "scope": "./",

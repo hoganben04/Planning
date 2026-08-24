@@ -1,4 +1,4 @@
-/* Bea's Course Builder — photographs of horses.
+/* Bea’s Course Builder — photographs of horses.
 
    A photo straight off an iPhone is several megabytes. The browser gives the
    whole app about five megabytes of storage for everything — every course, every

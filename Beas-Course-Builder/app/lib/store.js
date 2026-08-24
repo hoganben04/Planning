@@ -1,4 +1,4 @@
-/* Bea's Course Builder — where everything is kept.
+/* Bea’s Course Builder — where everything is kept.
 
    One store holds the whole app: her horses, her courses, her kit list and her
    settings. Anything that changes goes through `update()`, which saves and then
@@ -25,8 +25,8 @@
      live, so changing one strands everything already saved on the phone and the
      app opens empty.
 
-     The `bcb` prefix is short for the app's old, misspelled name ("Bee's" rather
-     than "Bea's"). It stays deliberately: the spelling in front of her is what
+     The `bcb` prefix is short for the app's old, misspelled name ("Bee’s" rather
+     than "Bea’s"). It stays deliberately: the spelling in front of her is what
      matters, and no amount of internal tidiness is worth losing a saved course
      over. tests/precache.test.js pins these three strings so a future rename
      cannot quietly break them. */

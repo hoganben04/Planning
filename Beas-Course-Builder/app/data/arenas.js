@@ -1,4 +1,4 @@
-/* Bea's Course Builder — arena presets.
+/* Bea’s Course Builder — arena presets.
 
    Sizes are the ones people actually ride in. The FEI competition minimums are
    included only so the app can say "this is a schooling arena, not a competition

@@ -1,4 +1,4 @@
-/* Bea's Course Builder — the course itself, and checking it over.
+/* Bea’s Course Builder — the course itself, and checking it over.
 
    `checkCourse` is the app's second job after measuring distances: read the whole
    course the way an instructor would walk it, and say what needs attention.

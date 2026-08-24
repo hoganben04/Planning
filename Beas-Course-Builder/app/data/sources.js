@@ -1,4 +1,4 @@
-/* Bea's Course Builder — provenance register.
+/* Bea’s Course Builder — provenance register.
 
    Every governing-body figure in this app carries a source id from this file so
    the Reference screen can show where a number came from and how much to trust
@@ -229,7 +229,7 @@
     },
     'bcb-estimate': {
       confidence: 'estimate',
-      body: "Bea's Course Builder",
+      body: "Bea’s Course Builder",
       what: 'Our own default where no source could be found — most often a fence '
         + 'spread, since the British Showjumping "Heights and Spreads of '
         + 'Obstacles" table was unreachable. Edit these freely.',

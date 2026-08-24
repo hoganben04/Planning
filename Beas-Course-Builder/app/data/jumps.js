@@ -1,4 +1,4 @@
-/* Bea's Course Builder — the obstacle catalogue.
+/* Bea’s Course Builder — the obstacle catalogue.
 
    Each entry says what a fence is, what it takes to build it, and how it should
    be drawn from above. `kit` is counted in the units a rider actually owns:

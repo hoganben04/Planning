@@ -1,4 +1,4 @@
-/* Bea's Course Builder — small pieces of interface.
+/* Bea’s Course Builder — small pieces of interface.
 
    Element building, toasts, modal sheets and the bits of wording that appear in
    more than one place. Nothing clever, just kept in one spot so the app sounds

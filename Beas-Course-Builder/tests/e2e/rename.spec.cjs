@@ -1,4 +1,4 @@
-/* The app was renamed from "Bee's" to "Bea's" after it had already shipped, so
+/* The app was renamed from "Bee’s" to "Bea’s" after it had already shipped, so
    this checks the rename was genuinely cosmetic: the new name is visible, and
    anything she saved under the old build is still there. */
 const { test, expect } = require('playwright/test');
@@ -6,14 +6,14 @@ const H = require('./helpers.cjs');
 
 test('the app shows the corrected name', async ({ page }) => {
   await H.openApp(page);
-  await expect(page).toHaveTitle(/Bea's Course Builder/);
-  await expect(page.locator('.topbar__title')).toContainText("Bea's Course Builder");
+  await expect(page).toHaveTitle(/Bea’s Course Builder/);
+  await expect(page.locator('.topbar__title')).toContainText("Bea’s Course Builder");
   const manifest = await page.evaluate(async () => {
     const r = await fetch('./manifest.webmanifest');
     return await r.json();
   });
-  expect(manifest.name).toBe("Bea's Course Builder");
-  expect(manifest.short_name).toBe("Bea's Courses");
+  expect(manifest.name).toBe("Bea’s Course Builder");
+  expect(manifest.short_name).toBe("Bea’s Courses");
 });
 
 test('a course saved under the old name is still there after it', async ({ page }) => {
@@ -75,11 +75,11 @@ test('the printed course sheet carries the corrected name', async ({ page }) => 
   await page.locator('.iconbtn--primary', { hasText: 'Share' }).click();
   await page.locator('.row', { hasText: 'Print a course sheet' }).click();
   await page.waitForTimeout(300);
-  await expect(page.locator('#sheet')).toContainText("Bea's Course Builder");
+  await expect(page.locator('#sheet')).toContainText("Bea’s Course Builder");
 });
 
 test('the landing page carries the corrected name', async ({ page }) => {
   await page.goto('/about.html');
-  await expect(page).toHaveTitle(/Bea's Course Builder/);
-  await expect(page.locator('h1')).toHaveText("Bea's Course Builder");
+  await expect(page).toHaveTitle(/Bea’s Course Builder/);
+  await expect(page.locator('h1')).toHaveText("Bea’s Course Builder");
 });

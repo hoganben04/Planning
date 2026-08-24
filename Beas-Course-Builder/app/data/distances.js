@@ -1,4 +1,4 @@
-/* Bea's Course Builder — stride and distance reference.
+/* Bea’s Course Builder — stride and distance reference.
 
    THE ONE IDEA THAT MAKES THE MATHS WORK. A horse lands about half a stride
    beyond a fence and takes off about half a stride before the next one. So the

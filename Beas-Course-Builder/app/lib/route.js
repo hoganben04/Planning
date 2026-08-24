@@ -1,4 +1,4 @@
-/* Bea's Course Builder — the ridden line.
+/* Bea’s Course Builder — the ridden line.
 
    The track is the line she will actually ride, and it matters for two reasons:
    it is what the distances are measured along (a dogleg is measured round the
