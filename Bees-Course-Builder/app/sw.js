@@ -8,7 +8,7 @@
    offline bug is adding a file, forgetting this list, and everything working
    perfectly until someone is somewhere without a signal. */
 
-const VERSION = '2026-08-23-1';
+const VERSION = '2026-08-24-1';
 const CACHE = 'bcb-' + VERSION;
 
 const PRECACHE = [
@@ -31,6 +31,7 @@ const PRECACHE = [
   './lib/render.js',
   './lib/interact.js',
   './lib/share.js',
+  './lib/photo.js',
   './lib/ui.js',
   './lib/editor.js',
   './lib/app.js',

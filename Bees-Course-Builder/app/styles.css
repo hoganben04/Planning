@@ -248,6 +248,18 @@ p { margin: 8px 0; }
 }
 .empty__big { font-size: 34px; }
 
+/* ---------- Photos ---------- */
+.avatar {
+  flex: none; display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 50%; overflow: hidden; object-fit: cover;
+  border: 1px solid var(--line); background: var(--panel-2);
+}
+.avatar--letter { color: #fff; font-weight: 700; border-color: transparent; }
+
+.photorow { display: flex; gap: 14px; align-items: center; }
+.photorow__pic { flex: none; }
+.photorow__body { min-width: 0; }
+
 /* ---------- Forms ---------- */
 .field { display: block; }
 .field__label { display: block; font-size: 13px; font-weight: 650; margin-bottom: 5px; }

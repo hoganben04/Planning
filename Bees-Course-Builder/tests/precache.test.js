@@ -32,12 +32,20 @@ function shippedFiles(dir, prefix) {
 /* Files that ship but are deliberately not precached, with the reason. */
 const NOT_PRECACHED = new Set([
   './sw.js',        /* the worker itself is fetched by the browser, not by us */
-  './.nojekyll'     /* a marker for GitHub Pages; nothing ever requests it */
+  './.nojekyll',    /* a marker for GitHub Pages; nothing ever requests it */
+  './about.html'    /* the page for showing people: read once, over a signal, and
+                       not worth spending her offline storage on. The worker
+                       caches it on demand if she does open it. */
 ]);
+
+/* Same reasoning for the pictures on that page — they are big, and they are of no
+   use out in a field. */
+function isLandingAsset(file) { return file.indexOf('./images/') === 0; }
 
 test('every file in app/ is in the service worker precache list', () => {
   const listed = new Set(precacheList());
-  const shipped = shippedFiles(APP, './').filter(f => !NOT_PRECACHED.has(f));
+  const shipped = shippedFiles(APP, './')
+    .filter(f => !NOT_PRECACHED.has(f) && !isLandingAsset(f));
   const missing = shipped.filter(f => !listed.has(f));
   assert.deepStrictEqual(missing, [],
     `these ship but would not be available offline: ${missing.join(', ')}`);
@@ -105,7 +113,25 @@ test('the manifest and the icons agree', () => {
 test('nothing is linked with an absolute path, which would break in a subfolder', () => {
   /* The app is published at /course-builder/, so a leading slash would resolve to
      the other app at the site root. */
-  const html = fs.readFileSync(path.join(APP, 'index.html'), 'utf8');
-  const absolute = [...html.matchAll(/(?:src|href)="(\/[^/][^"]*)"/g)].map(m => m[1]);
-  assert.deepStrictEqual(absolute, [], `absolute paths found: ${absolute.join(', ')}`);
+  for (const file of ['index.html', 'about.html']) {
+    const html = fs.readFileSync(path.join(APP, file), 'utf8');
+    const absolute = [...html.matchAll(/(?:src|href)="(\/[^/][^"]*)"/g)].map(m => m[1]);
+    assert.deepStrictEqual(absolute, [], `absolute paths in ${file}: ${absolute.join(', ')}`);
+  }
+});
+
+test('the landing page points at the app and at pictures that exist', () => {
+  const html = fs.readFileSync(path.join(APP, 'about.html'), 'utf8');
+  assert.match(html, /href="\.\/"/, 'it must link to the app itself');
+  assert.match(html, /lang="en-GB"/);
+  for (const m of html.matchAll(/src="\.\/(images|icons)\/([^"]+)"/g)) {
+    const file = path.join(APP, m[1], m[2]);
+    /* hero.jpg is the one deliberate exception: it is the slot for a photo that
+       may not have been supplied yet, and the page copes without it. */
+    if (m[2] === 'hero.jpg') continue;
+    assert.ok(fs.existsSync(file), `${m[1]}/${m[2]} is referenced but missing`);
+  }
+  /* And the missing-photo case must degrade rather than leave a broken image. */
+  assert.match(html, /hero\.jpg[\s\S]{0,120}onerror="this\.remove\(\)"/,
+    'the hero photo must remove itself when the file is absent');
 });

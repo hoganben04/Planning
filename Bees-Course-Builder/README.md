@@ -10,6 +10,10 @@ on the phone.
 **[Open the app](https://hoganben04.github.io/Planning/course-builder/)** — then
 see *Putting it on your phone* below.
 
+**[Landing page](https://hoganben04.github.io/Planning/course-builder/about.html)** —
+the page to send to somebody who has never seen it: what it does, screenshots,
+and the install steps. Bee's own courses are behind the app link above.
+
 ## What it does
 
 - **Draw a course on a to-scale arena.** Drop jumps in, drag them about, turn
@@ -25,7 +29,8 @@ see *Putting it on your phone* below.
   are stood in the arena with a pole under each arm.
 - **Your own horses.** Everything comes from the canter stride length, so a
   14.2hh pony gets pony distances rather than a horse's. Switch horse and every
-  distance is worked out again.
+  distance is worked out again. Each one can have a photo, kept on the phone and
+  never uploaded.
 - **Your own jumps.** Tell it what you actually own and it warns you when a
   course needs more wings or poles than you have, and lists what to carry out.
 - **Number the fences to set the route.** Numbering *is* the route. Two fences a
@@ -123,6 +128,8 @@ dependency for the browser tests.
 ```
 app/
   index.html            the shell
+  about.html            the landing page — self-contained, its own styles
+  images/               screenshots for that page, and the hero photo slot
   styles.css            theme, layout, components
   print.css             the course sheet
   manifest.webmanifest  makes it installable
@@ -143,6 +150,7 @@ app/
     render.js           course -> SVG
     interact.js         pointer handling: drag, rotate, pinch, snap
     share.js            picture, print, link and file
+    photo.js            shrinking a horse photo down to something storable
     ui.js               small pieces of interface
     editor.js           the arena editor screen
     app.js              router and the other screens
@@ -196,6 +204,26 @@ iPhone. So these need trying on a real device:
 - Add to Home Screen, the icon, and the full-screen launch
 - the notch and home-indicator insets
 
+### Putting your own photo on the landing page
+
+Drop a picture at `app/images/hero.jpg` and it takes over the top of the landing
+page. There is nothing to switch on: the page asks for that file, and if it is not
+there the `<img>` removes itself and the drawn arena underneath shows instead — so
+the page looks finished either way, and adding the photo needs no code change.
+
+Two things worth doing when you add one:
+
+- **Shrink it first.** Anything over about 400KB makes the page slow on a phone
+  signal. Roughly 1600px on the long edge is plenty.
+- **Fix the alt text.** It currently reads `alt="Bee and her pony"`, which is a
+  guess. Change it in `app/about.html` to describe what the picture actually shows.
+
+Horse photos inside the app are a different thing and need no work from you: she
+picks one on the horse's page and `lib/photo.js` crops it square, scales it to
+480px and squeezes it under 120KB before storing it. That matters because the
+browser gives the whole app about 5MB for everything, and one untouched iPhone
+photo would fill it.
+
 ### Publishing
 
 `.github/workflows/deploy-pages.yml` assembles **both** apps in this repository
@@ -204,6 +232,12 @@ replaces the whole thing:
 
 - `/` — the farm safety training app (unchanged)
 - `/course-builder/` — this app
+- `/course-builder/about.html` — the landing page
+
+The landing page and its screenshots are deliberately **not** in the service
+worker's precache list: they are large, they are read once over a signal, and they
+are of no use standing in a field. The worker still caches them on demand if she
+does open the page.
 
 Every path in this app is relative for that reason. An absolute path would resolve
 to the other app at the site root, and there is a test that checks for it.

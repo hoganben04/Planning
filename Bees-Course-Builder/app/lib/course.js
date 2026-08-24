@@ -42,7 +42,8 @@
     return Object.assign({
       id: id('horse'), name: '', typeId: 'pony-large', breed: '',
       heightCm: 148, strideM: null, takeoffM: null, landingM: null,
-      turnRadiusM: null, colour: '#7C5CD3', notes: ''
+      turnRadiusM: null, colour: '#7C5CD3', notes: '',
+      photo: null   /* a small square JPEG as a data URI — see lib/photo.js */
     }, over || {});
   }
 

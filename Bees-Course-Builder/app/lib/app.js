@@ -398,6 +398,7 @@
       list.appendChild(h('button', {
         class: 'row', type: 'button', onclick: () => navigate(`#/horses/${horse.id}`)
       }, [
+        avatar(horse, 44),
         h('span', { class: 'row__main' }, [
           h('div', { class: 'row__title' }, [
             horse.name || 'Unnamed',
@@ -415,6 +416,25 @@
     el.view.appendChild(pad);
   }
 
+  /* The photo where there is one, otherwise the first letter of her name on a
+     coloured disc — so the list looks deliberate either way rather than having a
+     hole in it. */
+  function avatar(horse, size) {
+    const px = size || 44;
+    if (horse.photo) {
+      return h('img', {
+        class: 'avatar', src: horse.photo, alt: '',
+        width: px, height: px, style: `width:${px}px;height:${px}px`
+      });
+    }
+    const letter = (horse.name || '?').trim().charAt(0).toUpperCase() || '?';
+    return h('span', {
+      class: 'avatar avatar--letter', 'aria-hidden': 'true',
+      style: `width:${px}px;height:${px}px;background:${horse.colour || 'var(--accent)'};`
+        + `font-size:${Math.round(px * 0.42)}px`
+    }, [letter]);
+  }
+
   function screenHorse(id) {
     const horse = store.horse(id);
     if (!horse) { navigate('#/horses'); return; }
@@ -423,6 +443,8 @@
 
     const pad = h('div', { class: 'pad stack' });
     const save = patch => { Object.assign(horse, patch); store.saveHorse(horse); };
+
+    pad.appendChild(photoRow(horse, save));
 
     pad.appendChild(fieldRow('Name', h('input', {
       type: 'text', value: horse.name, placeholder: 'Bramble',
@@ -513,6 +535,60 @@
     }, ['Delete']));
 
     el.view.appendChild(pad);
+  }
+
+  /* Choosing a photo. `capture` is deliberately absent: on an iPhone the plain
+     file input offers Take Photo, Photo Library and Browse, which is more use
+     than forcing the camera open. */
+  function photoRow(horse, save) {
+    const file = h('input', {
+      type: 'file', accept: 'image/*', class: 'sr-only', id: 'horse-photo-input'
+    });
+    const picture = h('div', { class: 'photorow__pic' }, [avatar(horse, 92)]);
+    const status = h('div', { class: 'field__hint' }, [
+      horse.photo ? 'Kept on this device only, never uploaded.'
+        : 'Optional. Kept on this device only, never uploaded.'
+    ]);
+
+    file.addEventListener('change', async () => {
+      const chosen = file.files && file.files[0];
+      if (!chosen) return;
+      status.textContent = 'Shrinking it down…';
+      try {
+        const photo = await root.bcbPhoto.fromFile(chosen);
+        save({ photo });
+        clear(picture);
+        picture.appendChild(avatar(horse, 92));
+        status.textContent = 'Kept on this device only, never uploaded.';
+        route();
+      } catch (err) {
+        status.textContent = err.message || 'That picture could not be used.';
+      }
+      file.value = '';
+    });
+
+    const buttons = h('div', { style: 'display:flex;gap:8px;flex-wrap:wrap' }, [
+      h('button', {
+        class: 'iconbtn', type: 'button',
+        onclick: () => file.click()
+      }, [horse.photo ? 'Change photo' : 'Add a photo']),
+      horse.photo ? h('button', {
+        class: 'iconbtn', type: 'button', style: 'color:var(--error)',
+        onclick: async () => {
+          const yes = await confirmSheet({
+            title: 'Remove this photo?', confirmLabel: 'Remove', danger: true
+          });
+          if (!yes) return;
+          save({ photo: null });
+          route();
+        }
+      }, ['Remove']) : null
+    ]);
+
+    return h('div', { class: 'photorow' }, [
+      picture,
+      h('div', { class: 'photorow__body' }, [buttons, status, file])
+    ]);
   }
 
   /* ---- screen: the reference tables -------------------------------------- */

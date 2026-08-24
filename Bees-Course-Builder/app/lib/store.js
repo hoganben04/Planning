@@ -85,10 +85,25 @@
     const db = Object.assign(blankDb(), raw);
     db.settings = Object.assign(blankDb().settings, raw.settings || {});
     db.settings.kit = Object.assign(blankDb().settings.kit, (raw.settings && raw.settings.kit) || {});
-    db.horses = Array.isArray(raw.horses) ? raw.horses : [];
+    db.horses = (Array.isArray(raw.horses) ? raw.horses : []).map(repairHorse).filter(Boolean);
     db.courses = Array.isArray(raw.courses) ? raw.courses.map(repairCourse).filter(Boolean) : [];
     db.schemaVersion = SCHEMA;
     return { db, refused: false };
+  }
+
+  /* Photos arriving in a backup are checked rather than trusted: anything that is
+     not plainly an image data URI is dropped, and anything oversized goes too,
+     because one big blob in a shared file could fill the whole storage budget. */
+  const MAX_PHOTO_CHARS = 400 * 1024;
+  function repairHorse(h) {
+    if (!h || typeof h !== 'object') return null;
+    const horse = Object.assign(C.newHorse(), h);
+    const photo = horse.photo;
+    const ok = typeof photo === 'string'
+      && /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(photo)
+      && photo.length <= MAX_PHOTO_CHARS;
+    horse.photo = ok ? photo : null;
+    return horse;
   }
 
   /* A course from a file or a shared link must never be able to break the app,
@@ -402,6 +417,7 @@
   }
 
   return {
-    bcbStore: { createStore, blankDb, migrate, repairCourse, seed, KEY, BACKUP_KEY, UI_KEY, SCHEMA }
+    bcbStore: { createStore, blankDb, migrate, repairCourse, repairHorse, seed,
+      KEY, BACKUP_KEY, UI_KEY, SCHEMA, MAX_PHOTO_CHARS }
   };
 });
