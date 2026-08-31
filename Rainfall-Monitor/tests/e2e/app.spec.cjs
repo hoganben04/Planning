@@ -26,6 +26,11 @@ test('the gauge it ships with loads, and the readings appear', async ({ page }) 
   await expect(card.locator('.tile', { hasText: 'in 6 hours' }).locator('.tile-value'))
     .toContainText('5.7');
 
+  /* The newest period is still running at the frozen 01:07, and that must not be
+     held against the hourly tile. */
+  await expect(card.locator('.tile', { hasText: 'in an hour' }).locator('.tile-note'))
+    .toHaveCount(0);
+
   await expect(card.locator('.peak')).toContainText('3.32mm');
   await expect(card.locator('.peak')).toContainText('13.3mm/h');
   await expect(card.locator('.peak')).toContainText('heavy');

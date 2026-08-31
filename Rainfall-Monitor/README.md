@@ -184,7 +184,7 @@ app/lib/       readings.js  parsing the EA's answers into a clean series
                chart.js     the SVG, as a string
                ui.js        data in, HTML out; listens to nothing
                app.js       the only file that touches the DOM or the network
-tests/         100 unit tests, run with node --test
+tests/         105 unit tests, run with node --test
 tests/e2e/     15 browser tests, with the EA stubbed and the clock frozen
 ```
 

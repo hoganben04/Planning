@@ -70,9 +70,31 @@
 
      The window is [from, to) on the start of each reading's covered period — see
      slotStart() for why that bracketing and not another. */
+  /* How many readings a window COULD have, which is not the same as how many
+     periods it spans.
+
+     A 15-minute accumulation can only exist once its 15 minutes are up, so at
+     08:21 the period that began at 08:15 has not been measured yet, let alone
+     transmitted. Counting it as expected made a perfectly healthy gauge report
+     "only 75% of the window" on the hourly tile for the first few minutes of
+     every quarter hour — a false alarm on the most-looked-at number in the app,
+     and worse than useless: it teaches you to ignore the warning that exists to
+     tell you a gauge has genuinely gone quiet.
+
+     So the count runs to the last period that had finished by `to`. */
+  function reportableSlots(from, to, periodMs) {
+    if (!periodMs || to <= from) return 1;
+    /* EA timestamps sit on absolute quarter-hour boundaries, so the slots are
+       aligned to multiples of the period in epoch time rather than to `from`. */
+    const first = Math.ceil(from / periodMs) * periodMs;
+    const last = Math.floor((to - periodMs) / periodMs) * periodMs;
+    if (last < first) return 1;
+    return Math.max(1, Math.floor((last - first) / periodMs) + 1);
+  }
+
   function windowSum(series, from, to) {
     const expected = series && series.periodMinutes
-      ? Math.max(1, Math.round((to - from) / (series.periodMinutes * MINUTE)))
+      ? reportableSlots(from, to, series.periodMinutes * MINUTE)
       : 1;
     if (!series || series.empty) {
       return { mm: null, count: 0, expected, coverage: 0, from, to, wet: 0 };
@@ -371,7 +393,7 @@
   }
 
   const rmAnalyse = {
-    windowSum, windowTotal, totals, totalLevel, dayTotal, dayBounds,
+    windowSum, windowTotal, totals, totalLevel, dayTotal, dayBounds, reportableSlots,
     ratePerHour, peak, current, spell, freshness,
     assessRainfall, levelSummary, assessLevel, formatMinutes,
     WET_MM, GOOD_COVERAGE

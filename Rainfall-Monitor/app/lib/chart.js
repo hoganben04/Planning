@@ -132,7 +132,21 @@
     if (!inWindow.length) return empty('No readings in this window');
 
     const peak = inWindow.reduce((m, r) => Math.max(m, r.value), 0);
-    const max = niceMax(peak, 1);
+    /* The threshold, as a single period's worth of rain, so a 20mm/h line lands
+       where one 15-minute bar would have to reach to be raining that hard. */
+    const perPeriod = o.rateLineMmPerHour
+      ? o.rateLineMmPerHour * ((series.periodMinutes || 15) / 60)
+      : 0;
+    let max = niceMax(peak, 1);
+    /* If the line would sit exactly on the top of the axis it reads as the
+       chart's own border rather than as a threshold — which is what happened
+       with a 4.14mm peak against a 20mm/h mark, both landing on 5. Give it a
+       step of headroom, but only when the line is going to be drawn at all: a
+       quiet day keeps its sensitive axis rather than being flattened to make
+       room for a mark nowhere near being met. */
+    if (perPeriod && perPeriod <= max && perPeriod >= max * 0.97) {
+      max = niceMax(perPeriod * 1.05, 1);
+    }
     const y = v => PLOT.y + PLOT.h - Math.min(1, v / max) * PLOT.h;
 
     let out = open(o.title || 'Rainfall');
@@ -156,8 +170,7 @@
     /* The threshold line, when one applies to a single period. Drawn as an
        hourly-rate equivalent so a 20mm/h alert shows where a single 15-minute
        bar would have to reach to be raining that hard. */
-    if (o.rateLineMmPerHour) {
-      const perPeriod = o.rateLineMmPerHour * ((series.periodMinutes || 15) / 60);
+    if (perPeriod) {
       if (perPeriod <= max) {
         const ly = round(y(perPeriod));
         out += `<line class="rm-threshold" x1="${PLOT.x}" y1="${ly}" x2="${PLOT.x + PLOT.w}" y2="${ly}" />`;

@@ -158,3 +158,36 @@ test('a five-day window does not draw thousands of gap markers', () => {
   assert.ok(count(svg, 'rm-gap') <= 480);
   assert.ok(svg.length < 60000, `chart markup was ${svg.length} bytes`);
 });
+
+test('the threshold line is never flush with the top of the axis', () => {
+  /* From a live screenshot: a 4.14mm peak rounds the axis to 5, and a 20mm/h
+     mark is 5mm over a quarter of an hour, so the line landed exactly on the
+     frame and read as the chart's own border. */
+  const series = R.normalise({
+    items: [0.2, 4.14, 1.1].map((value, i) => ({
+      dateTime: new Date(NOW - (2 - i) * 900000).toISOString(),
+      measure: MEASURE,
+      value
+    }))
+  }, { stationId: 'E9660' });
+  const svg = C.bars(series, { from: NOW - 24 * 3600000, to: NOW, rateLineMmPerHour: 20 });
+  const axisTop = svg.match(/text-anchor="end">([\d.]+)mm</);
+  assert.ok(axisTop, 'the axis is labelled');
+  assert.ok(Number(axisTop[1]) > 5, `axis top was ${axisTop[1]}, leaving no room above the mark`);
+  assert.match(svg, /class="rm-threshold"/);
+});
+
+test('a quiet day keeps its sensitive axis rather than making room for a distant mark', () => {
+  /* The other side of it: flattening a 0.3mm day onto a 6mm axis to accommodate
+     a threshold nowhere near being met would hide the only data there is. */
+  const series = R.normalise({
+    items: [0.1, 0.3, 0.2].map((value, i) => ({
+      dateTime: new Date(NOW - (2 - i) * 900000).toISOString(),
+      measure: MEASURE,
+      value
+    }))
+  }, { stationId: 'E9660' });
+  const svg = C.bars(series, { from: NOW - 6 * 3600000, to: NOW, rateLineMmPerHour: 20 });
+  assert.match(svg, /text-anchor="end">1mm</);
+  assert.equal((svg.match(/class="rm-threshold"/g) || []).length, 0);
+});

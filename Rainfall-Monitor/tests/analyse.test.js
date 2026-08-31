@@ -351,3 +351,43 @@ test('the day boundary still holds with the window bracketed on the period start
   assert.equal(today.mm, 7);
   assert.equal(today.count, 1);
 });
+
+test('the period still in progress is not counted against a window', () => {
+  /* The real case this came from, off a live gauge at 08:21: readings present
+     for 07:30, 07:45 and 08:00, and the 08:15 period not yet finished let alone
+     transmitted. The hourly tile said "only 75% of the window" about a gauge
+     that was perfectly healthy — a false alarm on the most-looked-at number,
+     and one that trains you to ignore the warning when it is real. */
+  const now = Date.parse('2026-08-31T08:21:00Z');
+  const series = build('2026-08-31T07:30:00Z', [[0, 0], [15, 0], [30, 0]]);
+  const hour = A.windowTotal(series, now, 1);
+  assert.equal(hour.count, 3);
+  assert.equal(hour.expected, 3, 'three finished periods in the hour, not four');
+  assert.equal(hour.coverage, 1);
+
+  const rows = A.totals(series, now, [{ hours: 1, label: 'in an hour', watchMm: 10, alertMm: 20 }]);
+  assert.equal(rows[0].thin, false);
+  assert.equal(rows[0].mm, 0, 'and it still reports a genuine nought');
+});
+
+test('a window that really is missing readings is still flagged', () => {
+  /* The other side of the same fix: excluding the in-progress period must not
+     stop a gauge that has gone quiet from being called out. */
+  const now = Date.parse('2026-08-31T08:21:00Z');
+  const series = build('2026-08-31T07:30:00Z', [[0, 1], [15, 1], [30, 1]]);
+  const six = A.windowTotal(series, now, 6);
+  assert.equal(six.count, 3);
+  assert.equal(six.expected, 23, 'six hours to the last finished period');
+  assert.ok(six.coverage < A.GOOD_COVERAGE);
+  const rows = A.totals(series, now, [{ hours: 6, label: 'in 6 hours', watchMm: 20, alertMm: 40 }]);
+  assert.equal(rows[0].thin, true);
+});
+
+test('reportable slots are counted off the period boundaries, not off the window edge', () => {
+  const p = 15 * 60000;
+  const at = s => Date.parse(`2026-08-31T${s}:00Z`);
+  assert.equal(A.reportableSlots(at('07:21'), at('08:21'), p), 3);
+  assert.equal(A.reportableSlots(at('00:00'), at('06:00'), p), 24);
+  assert.equal(A.reportableSlots(at('00:00'), at('03:00'), 60 * 60000), 3);
+  assert.equal(A.reportableSlots(at('08:00'), at('08:05'), p), 1, 'never zero, or coverage divides by it');
+});

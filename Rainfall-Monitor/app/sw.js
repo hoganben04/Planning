@@ -20,7 +20,7 @@
    file, forgetting this list, and everything working perfectly right up until
    somebody is stood in a gateway with no signal. */
 
-const VERSION = '2026-08-31-1';
+const VERSION = '2026-08-31-2';
 const CACHE = 'rm-' + VERSION;
 
 const PRECACHE = [
