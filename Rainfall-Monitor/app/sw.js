@@ -20,7 +20,7 @@
    file, forgetting this list, and everything working perfectly right up until
    somebody is stood in a gateway with no signal. */
 
-const VERSION = '2026-08-31-2';
+const VERSION = '2026-08-31-3';
 const CACHE = 'rm-' + VERSION;
 
 const PRECACHE = [
@@ -59,6 +59,13 @@ self.addEventListener('install', event => {
         /* One missing file must not stop the rest being cached. */
       }
     }));
+    /* Take over as soon as the new files are stored, rather than waiting for
+       every tab to be closed. Without this, clients.claim() in activate never
+       runs on an open page and a fix reaches an installed copy two opens later
+       — which is the wrong trade for an app whose job is warning you about
+       something. Nothing here is lost by it: the settings are written the moment
+       they are changed, so there is no half-finished edit to yank away. */
+    await self.skipWaiting();
   })());
 });
 
@@ -67,9 +74,9 @@ self.addEventListener('activate', event => {
     for (const name of await caches.keys()) {
       if (name !== CACHE && name.startsWith('rm-')) await caches.delete(name);
     }
-    /* Unlike an app you might be part way through editing, there is nothing here
-       to lose by taking over immediately, and a warning app should not be a
-       version behind for longer than it has to be. */
+    /* Paired with skipWaiting() in install: that gets this worker activated
+       without waiting for tabs to close, this puts the already-open pages under
+       it. Both are needed; either alone leaves an open page on the old bundle. */
     await self.clients.claim();
   })());
 });

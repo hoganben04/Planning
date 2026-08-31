@@ -91,3 +91,11 @@ test('the service worker version was bumped when the shipped files changed', () 
      unbumped worker means a phone keeps running the old app for ever. */
   assert.match(SW, /const VERSION = '\d{4}-\d{2}-\d{2}-\d+'/);
 });
+
+test('a new version takes over an open page rather than waiting for it to close', () => {
+  /* skipWaiting and clients.claim are a pair. With only clients.claim — which is
+     how this shipped at first — the new worker sits in "waiting" until every tab
+     is closed, so a fix reaches an installed copy two opens later. */
+  assert.match(SW, /await self\.skipWaiting\(\)/);
+  assert.match(SW, /await self\.clients\.claim\(\)/);
+});
