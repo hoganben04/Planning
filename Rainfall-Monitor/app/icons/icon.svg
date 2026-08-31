@@ -1,0 +1,18 @@
+<!-- Rainfall Monitor icon: rain falling into a rising river.
+     Drawn on a 100x100 grid with no text, so it stays legible at 40px on a home
+     screen. tools/make_icons.mjs renders this to the PNG sizes iOS and the
+     manifest need; the PNGs are committed. -->
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Rain falling into a river">
+  <!-- The cloud, kept as one flat shape: gradients disappear at icon sizes. -->
+  <path d="M28 40a13 13 0 0 1 12.7-13c2.4-6.6 8.7-11 15.8-11 8.6 0 15.8 6.3 16.8 14.5A11.5 11.5 0 0 1 72 53H30.5A12.5 12.5 0 0 1 28 40z"
+        fill="#4A6472" />
+  <!-- Three drops, at the angle rain actually falls. -->
+  <g stroke="#2E86B8" stroke-width="7" stroke-linecap="round">
+    <line x1="36" y1="60" x2="32" y2="72" />
+    <line x1="52" y1="60" x2="48" y2="76" />
+    <line x1="68" y1="60" x2="64" y2="72" />
+  </g>
+  <!-- The water it lands in. -->
+  <path d="M6 88c8 0 8-5 16-5s8 5 16 5 8-5 16-5 8 5 16 5 8-5 16-5v10H6z"
+        fill="#2E86B8" opacity="0.85" />
+</svg>

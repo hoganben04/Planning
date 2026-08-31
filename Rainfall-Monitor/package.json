@@ -1,0 +1,12 @@
+{
+  "name": "rainfall-monitor",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Live Environment Agency rainfall and river levels for the gauges you care about, with your own warning marks, on your phone.",
+  "scripts": {
+    "dev": "python3 -m http.server 4174 --directory app",
+    "test": "node --test tests/*.test.js",
+    "test:e2e": "playwright test",
+    "icons": "node tools/make_icons.mjs"
+  }
+}

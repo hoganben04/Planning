@@ -1,0 +1,22 @@
+{
+  "id": "./",
+  "name": "Rainfall Monitor",
+  "short_name": "Rainfall",
+  "description": "Live Environment Agency rainfall and river levels for the gauges you care about, with your own warning marks, on your phone.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["standalone", "browser"],
+  "orientation": "any",
+  "background_color": "#E8F1F6",
+  "theme_color": "#1B6E9C",
+  "lang": "en-GB",
+  "dir": "ltr",
+  "categories": ["utilities", "weather"],
+  "icons": [
+    { "src": "./icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "./icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "./icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "./icons/icon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}

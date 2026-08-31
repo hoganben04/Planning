@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8" />
+  <!-- viewport-fit=cover is required or env(safe-area-inset-*) reports zero and
+       the app draws under the notch and the home indicator. -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Rainfall Monitor</title>
+  <meta name="description" content="Live Environment Agency rainfall and river levels for the gauges you care about, with your own warning marks, on your phone." />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Rainfall" />
+  <meta name="theme-color" content="#F7F9FB" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#0E1418" media="(prefers-color-scheme: dark)" />
+  <meta name="color-scheme" content="light dark" />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./icons/icon-180.png" />
+  <link rel="icon" href="./icons/icon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="topbar" id="topbar"></header>
+    <main class="view" id="view" tabindex="-1"></main>
+  </div>
+
+  <noscript>
+    <p style="padding:24px;font:16px system-ui">Rainfall Monitor needs JavaScript switched on.
+    It fetches the Environment Agency readings and works the totals out on your phone, rather
+    than on a server.</p>
+  </noscript>
+
+  <!-- Plain script tags, in dependency order, and no build step: the app is the
+       files. Each one adds itself to the window, so the order below is the only
+       thing keeping them straight — data first, then the pure logic, then the
+       wiring that needs all of it. -->
+  <script src="./data/sources.js"></script>
+  <script src="./data/stations.js"></script>
+  <script src="./data/thresholds.js"></script>
+  <script src="./lib/readings.js"></script>
+  <script src="./lib/analyse.js"></script>
+  <script src="./lib/api.js"></script>
+  <script src="./lib/store.js"></script>
+  <script src="./lib/chart.js"></script>
+  <script src="./lib/ui.js"></script>
+  <script src="./lib/app.js"></script>
+</body>
+</html>

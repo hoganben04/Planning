@@ -1,0 +1,326 @@
+/* Rainfall Monitor — the look.
+
+   One stylesheet, no framework. Written for a phone held in one hand in bad
+   light, which drove three decisions:
+
+     - Big numbers. The totals are the point, so they are set large enough to read
+       at arm's length without going looking for them.
+     - Colour that means something. Amber and red are reserved for a threshold
+       being passed or a gauge going quiet. Nothing else in the app is allowed to
+       be either colour, so a glance at the screen is enough.
+     - Dark by default in the dark. Opened at four in the morning to see what the
+       night has done, a white screen is the wrong thing to do to somebody. */
+
+:root {
+  color-scheme: light dark;
+
+  --bg: #F7F9FB;
+  --card: #FFFFFF;
+  --ink: #10171C;
+  --ink-soft: #56636E;
+  --line: #DCE3E9;
+  --accent: #1B6E9C;
+
+  --quiet: #4F6070;
+  --quiet-bg: #EEF2F5;
+  --watch: #A25A05;
+  --watch-bg: #FDF1DF;
+  --alert: #B3231C;
+  --alert-bg: #FCE9E7;
+
+  --bar: #2E86B8;
+  --bar-soft: #9CC6DD;
+  --gap: #B9C4CD;
+
+  --radius: 14px;
+  --shadow: 0 1px 2px rgba(16, 23, 28, .06), 0 4px 14px rgba(16, 23, 28, .05);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0E1418;
+    --card: #171F25;
+    --ink: #E8EEF2;
+    --ink-soft: #9AA9B4;
+    --line: #26313A;
+    --accent: #6FB6DC;
+
+    --quiet: #A0AEB8;
+    --quiet-bg: #1E272E;
+    --watch: #F0B360;
+    --watch-bg: #33260F;
+    --alert: #FF8A80;
+    --alert-bg: #3A1614;
+
+    --bar: #58A8D4;
+    --bar-soft: #2E5A73;
+    --gap: #47555F;
+
+    --shadow: none;
+  }
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 16px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  -webkit-text-size-adjust: 100%;
+}
+
+.app { min-height: 100dvh; }
+
+/* ---- Top bar ------------------------------------------------------------- */
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter: saturate(140%) blur(10px);
+  border-bottom: 1px solid var(--line);
+  padding: max(8px, env(safe-area-inset-top)) 12px 8px;
+}
+
+.topbar-inner {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  align-items: center;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.brand { display: flex; align-items: center; gap: 8px; font-weight: 650; }
+.brand-mark { font-size: 20px; color: var(--accent); }
+.brand-text { letter-spacing: -0.01em; }
+
+.topbar-status { display: flex; align-items: center; gap: 8px; }
+.checked { color: var(--ink-soft); font-size: 13px; }
+.topbar-actions { display: flex; gap: 8px; margin-inline-start: auto; }
+
+/* On a phone the four pieces will not fit on one line, and the least useful
+   wrap is the one that pushes the buttons onto a third row. So: brand and
+   buttons on the top line where a thumb expects them, status underneath across
+   the full width. */
+@media (max-width: 559px) {
+  .brand { order: 1; }
+  .topbar-actions { order: 2; }
+  .topbar-status { order: 3; flex-basis: 100%; }
+  /* Trimmed so the brand and both buttons fit one line on a 390px phone rather
+     than taking three rows of a sticky bar. */
+  .topbar .btn { padding: 8px 11px; }
+  .topbar-inner { gap: 6px 8px; }
+}
+
+/* ---- Buttons ------------------------------------------------------------- */
+
+.btn {
+  font: inherit;
+  font-weight: 550;
+  padding: 8px 14px;
+  min-height: 40px;
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  background: var(--accent);
+  color: #FFF;
+  cursor: pointer;
+}
+@media (prefers-color-scheme: dark) { .btn { color: #0E1418; } }
+
+.btn-quiet { background: transparent; color: var(--ink); border-color: var(--line); }
+.btn[disabled] { opacity: .6; cursor: default; }
+.btn:focus-visible, .chip:focus-visible, input:focus-visible, select:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.chip {
+  font: inherit;
+  font-size: 14px;
+  padding: 6px 12px;
+  min-height: 36px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink-soft);
+  cursor: pointer;
+}
+.chip-on { background: var(--quiet-bg); color: var(--ink); border-color: var(--ink-soft); font-weight: 600; }
+
+/* ---- Layout -------------------------------------------------------------- */
+
+.view {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 14px 12px calc(28px + env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.view:focus { outline: none; }
+
+.banner {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: var(--radius);
+  background: var(--watch-bg);
+  color: var(--watch);
+  font-weight: 550;
+}
+
+.empty-state { color: var(--ink-soft); }
+
+/* ---- Cards --------------------------------------------------------------- */
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 14px;
+}
+
+/* The one strong signal on the screen: a card whose thresholds have gone. */
+.card-watch { border-inline-start: 5px solid var(--watch); }
+.card-alert { border-inline-start: 5px solid var(--alert); }
+
+.card-head { display: flex; gap: 10px; align-items: flex-start; justify-content: space-between; }
+.card-name { margin: 0; font-size: 19px; letter-spacing: -0.01em; }
+.card-sub { margin: 2px 0 0; color: var(--ink-soft); font-size: 13px; }
+.ea-link { color: var(--accent); }
+.card-status { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0; }
+
+.pill {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 650;
+  white-space: nowrap;
+}
+.pill-quiet { background: var(--quiet-bg); color: var(--quiet); }
+.pill-watch { background: var(--watch-bg); color: var(--watch); }
+.pill-alert { background: var(--alert-bg); color: var(--alert); }
+
+.reasons { margin: 12px 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; }
+.reason {
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-weight: 550;
+}
+.reason-watch { background: var(--watch-bg); color: var(--watch); }
+.reason-alert { background: var(--alert-bg); color: var(--alert); }
+
+.now { margin: 12px 0 0; font-size: 17px; }
+.peak, .soft { color: var(--ink-soft); font-size: 14px; margin: 10px 0 0; }
+.error { margin: 10px 0 0; color: var(--alert); font-size: 14px; font-weight: 550; }
+
+/* ---- Tiles --------------------------------------------------------------- */
+
+.tiles {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
+  gap: 8px;
+}
+
+.tile {
+  padding: 10px;
+  border-radius: 10px;
+  background: var(--quiet-bg);
+  text-align: center;
+}
+.tile-watch { background: var(--watch-bg); }
+.tile-alert { background: var(--alert-bg); }
+
+.tile-value { font-size: 26px; font-weight: 680; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.tile-watch .tile-value { color: var(--watch); }
+.tile-alert .tile-value { color: var(--alert); }
+.tile-unit { font-size: 14px; font-weight: 550; margin-inline-start: 2px; color: var(--ink-soft); }
+.tile-label { font-size: 12.5px; color: var(--ink-soft); margin-top: 2px; }
+
+/* A total worked out from a window with holes in it. Struck through in spirit,
+   not literally: the number is still the best available, it just must not be
+   read as the whole story. */
+.tile-note { font-size: 11.5px; color: var(--watch); margin-top: 3px; }
+.tile-missing .tile-value { color: var(--ink-soft); }
+
+/* ---- Chart --------------------------------------------------------------- */
+
+.chart-wrap { margin-top: 14px; }
+
+.rm-chart { width: 100%; height: auto; display: block; overflow: visible; }
+.rm-grid { stroke: var(--line); stroke-width: 1; }
+.rm-baseline { stroke: var(--ink-soft); stroke-width: 1; }
+.rm-axis { fill: var(--ink-soft); font-size: 11px; font-family: inherit; }
+.rm-axis-low { fill: var(--ink-soft); }
+.rm-unit { font-weight: 600; }
+.rm-bar { fill: var(--bar); }
+.rm-gap { fill: var(--gap); }
+.rm-band { fill: var(--bar-soft); opacity: .35; }
+.rm-line { fill: none; stroke: var(--bar); stroke-width: 2.5; stroke-linejoin: round; }
+.rm-dot { fill: var(--bar); }
+.rm-threshold { stroke: var(--watch); stroke-width: 1.5; stroke-dasharray: 5 4; }
+.rm-threshold-alert { stroke: var(--alert); }
+.rm-threshold-label { fill: var(--watch); font-weight: 600; }
+.rm-empty { fill: var(--ink-soft); font-size: 14px; font-family: inherit; }
+
+.window { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+
+/* ---- Settings ------------------------------------------------------------ */
+
+.settings {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 14px;
+}
+.settings h2 { font-size: 16px; margin: 18px 0 6px; }
+.settings h2:first-child { margin-top: 0; }
+
+.rows { display: flex; flex-direction: column; gap: 10px; }
+.row { border: 1px solid var(--line); border-radius: 10px; padding: 10px; }
+.row-main { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.row-id { font-weight: 650; font-variant-numeric: tabular-nums; }
+.row-kind { color: var(--ink-soft); font-size: 13px; }
+.row-label { flex: 1 1 140px; min-width: 0; }
+.row-marks { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 8px; color: var(--ink-soft); font-size: 14px; }
+.row-marks input { width: 84px; }
+
+.add-row { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+#add-id { flex: 1 1 120px; min-width: 0; text-transform: uppercase; }
+
+input, select {
+  font: inherit;
+  padding: 8px 10px;
+  min-height: 40px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--bg);
+  color: var(--ink);
+}
+input[aria-invalid="true"] { border-color: var(--alert); }
+
+.thresholds { width: 100%; border-collapse: collapse; }
+.thresholds th, .thresholds td { text-align: start; padding: 6px 6px 6px 0; font-size: 14px; }
+.thresholds thead th { color: var(--ink-soft); font-weight: 550; }
+.thresholds tbody th { font-weight: 550; }
+.thresholds input { width: 84px; }
+
+.field { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.danger { margin-top: 20px; padding-top: 14px; border-top: 1px solid var(--line); }
+
+/* ---- Credit -------------------------------------------------------------- */
+
+.credit { color: var(--ink-soft); font-size: 12.5px; }
+.credit p { margin: 0 0 8px; }
+.credit a { color: var(--accent); }
+
+@media (min-width: 620px) {
+  .card-name { font-size: 21px; }
+  .tile-value { font-size: 30px; }
+}
