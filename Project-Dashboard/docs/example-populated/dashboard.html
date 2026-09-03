@@ -1,0 +1,261 @@
+<title>L&amp;P Project Register</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;600&display=swap">
+<style>
+/* Palette is drawn from utility record drawings: cool paper greys, DNO
+   linework teal for structure, and RAG reserved strictly for project state so
+   the accent never competes with a severity signal. */
+:root {
+  --paper:#f2f5f4; --surface:#ffffff; --surface-2:#fafbfb;
+  --ink:#101714; --ink-2:#3d4c46; --mute:#68786f;
+  --rule:#dde3e0; --rule-2:#e9edeb;
+  --accent:#12556b; --accent-soft:#dbe8ec;
+  --red:#a83228; --amber:#8f5c06; --green:#186340;
+  --red-bg:#f7e4e1; --amber-bg:#f8eddb; --green-bg:#e0efe7; --idle-bg:#eceeed;
+  --idle:#7d8b84;
+  --shadow:0 1px 2px rgba(16,23,20,.05), 0 1px 12px rgba(16,23,20,.04);
+}
+@media (prefers-color-scheme:dark) {
+  :root:not([data-theme="light"]) {
+    --paper:#0d1211; --surface:#151d1a; --surface-2:#1a2320;
+    --ink:#e7edea; --ink-2:#b3c0ba; --mute:#879990;
+    --rule:#26312d; --rule-2:#1f2926;
+    --accent:#6fb3c9; --accent-soft:#1c3238;
+    --red:#ff8d80; --amber:#e2a747; --green:#5ccb91;
+    --red-bg:#33201d; --amber-bg:#332818; --green-bg:#172c22; --idle-bg:#212a27;
+    --idle:#7b8a83;
+    --shadow:none;
+  }
+}
+:root[data-theme="dark"] {
+  --paper:#0d1211; --surface:#151d1a; --surface-2:#1a2320;
+  --ink:#e7edea; --ink-2:#b3c0ba; --mute:#879990;
+  --rule:#26312d; --rule-2:#1f2926;
+  --accent:#6fb3c9; --accent-soft:#1c3238;
+  --red:#ff8d80; --amber:#e2a747; --green:#5ccb91;
+  --red-bg:#33201d; --amber-bg:#332818; --green-bg:#172c22; --idle-bg:#212a27;
+  --idle:#7b8a83;
+  --shadow:none;
+}
+
+*, *::before, *::after { box-sizing:border-box; }
+
+body {
+  margin:0;
+  padding:32px 24px 72px;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:"IBM Plex Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
+  font-size:14px;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap { max-width:1280px; margin:0 auto; display:flex; flex-direction:column; gap:22px; }
+
+/* ---- masthead ---- */
+.masthead { display:flex; flex-wrap:wrap; align-items:flex-end; gap:16px 28px;
+  border-bottom:2px solid var(--ink); padding-bottom:14px; }
+.masthead h1 { font-family:"Barlow Semi Condensed","Arial Narrow",sans-serif;
+  font-size:clamp(30px,4.4vw,44px); font-weight:600; letter-spacing:-.01em;
+  line-height:1; margin:0; text-wrap:balance; }
+.masthead h1 .thin { color:var(--mute); font-weight:500; }
+.stamp { margin-left:auto; text-align:right; font-family:"IBM Plex Mono",monospace;
+  font-size:11px; line-height:1.7; color:var(--mute); letter-spacing:.02em; }
+.stamp b { color:var(--ink-2); font-weight:600; }
+
+.banner { background:var(--amber-bg); color:var(--amber);
+  border:1px solid var(--amber); border-left-width:4px;
+  padding:11px 15px; font-weight:600; font-size:13px; letter-spacing:.01em; }
+
+/* ---- instrument panel ---- */
+.panel-strip { display:grid; gap:1px; background:var(--rule);
+  grid-template-columns:repeat(auto-fit,minmax(148px,1fr));
+  border:1px solid var(--rule); box-shadow:var(--shadow); }
+.gauge { background:var(--surface); padding:13px 16px 15px; }
+.gauge .k { font-family:"IBM Plex Mono",monospace; font-size:9.5px;
+  text-transform:uppercase; letter-spacing:.11em; color:var(--mute);
+  margin-bottom:7px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.gauge .v { font-family:"Barlow Semi Condensed","Arial Narrow",sans-serif;
+  font-size:clamp(24px,2.4vw,33px); font-weight:600; line-height:.95;
+  letter-spacing:-.01em; font-variant-numeric:tabular-nums;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.gauge .v small { font-size:17px; font-weight:500; color:var(--mute); }
+.gauge.is-red .v { color:var(--red); } .gauge.is-amber .v { color:var(--amber); }
+.gauge.is-green .v { color:var(--green); }
+
+/* ---- sections ---- */
+section { background:var(--surface); border:1px solid var(--rule);
+  box-shadow:var(--shadow); }
+.head { display:flex; align-items:baseline; gap:12px; padding:14px 18px 12px;
+  border-bottom:1px solid var(--rule); }
+.head h2 { font-family:"IBM Plex Mono",monospace; font-size:10.5px; font-weight:600;
+  text-transform:uppercase; letter-spacing:.13em; color:var(--ink-2); margin:0; }
+.head .count { font-family:"IBM Plex Mono",monospace; font-size:10.5px;
+  color:var(--mute); margin-left:auto; letter-spacing:.04em; }
+.body { padding:4px 0 6px; }
+.pad { padding:16px 18px; }
+
+/* ---- attention rows: severity carried by a stripe, not colour alone ---- */
+.alerts { display:flex; flex-direction:column; }
+.alert { display:grid; grid-template-columns:4px 62px 1fr auto; gap:0 14px;
+  align-items:center; padding:11px 18px 11px 0; border-bottom:1px solid var(--rule-2); }
+.alert:last-child { border-bottom:none; }
+.alert .stripe { align-self:stretch; }
+.alert.sev-red .stripe { background:var(--red); }
+.alert.sev-amber .stripe { background:var(--amber); }
+.alert .job { font-family:"IBM Plex Mono",monospace; font-size:13px; font-weight:600;
+  font-variant-numeric:tabular-nums; }
+.alert .what { min-width:0; }
+.alert .what .nm { font-weight:600; }
+.alert .what .act { color:var(--ink-2); font-size:13px; }
+.alert .meta { text-align:right; font-size:12px; color:var(--mute); white-space:nowrap; }
+.alert .meta .who { display:block; color:var(--ink-2); }
+
+.tag { display:inline-block; font-family:"IBM Plex Mono",monospace; font-size:9.5px;
+  font-weight:600; text-transform:uppercase; letter-spacing:.09em;
+  padding:2px 6px; border-radius:2px; vertical-align:1px; }
+.tag-red { background:var(--red-bg); color:var(--red); }
+.tag-amber { background:var(--amber-bg); color:var(--amber); }
+.tag-late { background:var(--red-bg); color:var(--red); margin-left:5px; }
+
+/* ---- schedule table ---- */
+.scroll { overflow-x:auto; }
+table { width:100%; border-collapse:collapse; min-width:1000px; }
+thead th { font-family:"IBM Plex Mono",monospace; font-size:9.5px; font-weight:600;
+  text-transform:uppercase; letter-spacing:.1em; color:var(--mute); text-align:left;
+  padding:9px 12px; border-bottom:1px solid var(--rule); white-space:nowrap;
+  background:var(--surface-2); }
+tbody td { padding:9px 12px; border-bottom:1px solid var(--rule-2);
+  vertical-align:middle; }
+tbody tr:last-child td { border-bottom:none; }
+tbody tr:hover td { background:var(--surface-2); }
+td.sev { width:4px; padding:0; }
+tr.sev-red td.sev { background:var(--red); }
+tr.sev-amber td.sev { background:var(--amber); }
+tr.sev-green td.sev { background:var(--green); }
+tr.sev-none td.sev { background:var(--rule); }
+.job-c { font-family:"IBM Plex Mono",monospace; font-weight:600;
+  font-variant-numeric:tabular-nums; white-space:nowrap; }
+.nm-c { font-weight:600; min-width:190px; }
+.dim { color:var(--mute); }
+.nocard { font-family:"IBM Plex Mono",monospace; font-size:11px; color:var(--mute);
+  background:var(--idle-bg); padding:2px 6px; border-radius:2px; white-space:nowrap; }
+.stage-c { font-family:"IBM Plex Mono",monospace; font-size:12px; white-space:nowrap; }
+.stage-c .code { font-weight:600; color:var(--accent); }
+.money, .date-c { font-variant-numeric:tabular-nums; white-space:nowrap; }
+.money { text-align:right; }
+.late { color:var(--red); font-weight:600; }
+
+/* progress meter: bar plus number, so it reads without colour vision */
+.meter { display:flex; align-items:center; gap:9px; min-width:132px; }
+.meter .track { flex:1; height:7px; background:var(--rule); position:relative; }
+.meter .fill { position:absolute; inset:0 auto 0 0; background:var(--accent); }
+.meter .pct { font-family:"IBM Plex Mono",monospace; font-size:11.5px;
+  font-variant-numeric:tabular-nums; color:var(--ink-2); width:32px; text-align:right; }
+
+/* ---- funnel: genuinely ordered, so the sequence carries meaning ---- */
+.funnel { display:flex; flex-direction:column; gap:5px; }
+.frow { display:grid; grid-template-columns:30px minmax(120px,190px) 1fr 26px;
+  gap:12px; align-items:center; }
+.frow .code { font-family:"IBM Plex Mono",monospace; font-size:11px; font-weight:600;
+  color:var(--accent); }
+.frow .lbl { font-size:13px; color:var(--ink-2); }
+.frow .barwrap { background:var(--rule-2); height:14px; }
+.frow .bar { height:14px; background:var(--accent-soft);
+  border-right:3px solid var(--accent); }
+.frow .n { font-family:"IBM Plex Mono",monospace; font-size:12px; text-align:right;
+  font-variant-numeric:tabular-nums; color:var(--ink-2); }
+
+.note { font-size:12.5px; color:var(--mute); margin:0; }
+.note code { font-family:"IBM Plex Mono",monospace; font-size:11.5px; }
+footer { font-family:"IBM Plex Mono",monospace; font-size:10.5px; color:var(--mute);
+  text-align:center; letter-spacing:.04em; padding-top:4px; }
+footer code { color:var(--ink-2); }
+
+a:focus-visible, tr:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+@media (prefers-reduced-motion:reduce) { *{ transition:none!important; animation:none!important; } }
+@media (max-width:640px) {
+  body { padding:22px 14px 56px; }
+  .stamp { margin-left:0; text-align:left; }
+  .alert { grid-template-columns:4px 52px 1fr; }
+  .alert .meta { grid-column:3; text-align:left; }
+}
+</style>
+<div class="wrap">
+  <div class="banner">&#9888;&nbsp; EXAMPLE ONLY — synthetic demonstration data</div>
+
+  <header class="masthead">
+    <h1>Project Register<br><span class="thin">Land &amp; Power Civils</span></h1>
+    <div class="stamp">
+      generated <b>27 Aug 2026</b><br>
+      source <b>_STATUS.md</b> per project folder<br>
+      13 live &middot; 5 active enquiries
+    </div>
+  </header>
+
+  <div class="panel-strip">
+    <div class="gauge"><div class="k">Live projects</div>
+      <div class="v">13</div></div>
+    <div class="gauge"><div class="k">Active enquiries</div>
+      <div class="v">5</div></div>
+    <div class="gauge"><div class="k">Avg progress</div>
+      <div class="v">72<small>%</small></div></div>
+    <div class="gauge"><div class="k">Carded value</div>
+      <div class="v">£572k</div></div>
+    <div class="gauge is-red"><div class="k">Blocked</div>
+      <div class="v">1</div></div>
+    <div class="gauge is-amber"><div class="k">Watch</div>
+      <div class="v">3</div></div>
+    <div class="gauge is-green"><div class="k">On track</div>
+      <div class="v">7</div></div>
+    <div class="gauge"><div class="k">Cards in place</div>
+      <div class="v">9<small>/13</small></div></div>
+  </div>
+
+  <section>
+    <div class="head"><h2>Needs attention</h2>
+      <span class="count">4 items</span></div>
+    <div class="body">
+      <div class="alert sev-red"><div class="stripe"></div><div class="job">9005</div><div class="what"><div class="nm">Court Road ICP <span class="tag tag-red">blocked</span> <span class="tag tag-late">2d overdue</span></div><div class="act">Resolve with DNO</div></div><div class="meta"><span class="who">S. Manager</span>25 Aug 26</div></div><div class="alert sev-amber"><div class="stripe"></div><div class="job">9003</div><div class="what"><div class="nm">Mill Lane Farm <span class="tag tag-amber">watch</span> <span class="tag tag-late">1d overdue</span></div><div class="act">Chase LOAs</div></div><div class="meta"><span class="who">P. Manager</span>26 Aug 26</div></div><div class="alert sev-amber"><div class="stripe"></div><div class="job">9007</div><div class="what"><div class="nm">High Street Pumps <span class="tag tag-amber">watch</span> </div><div class="act">Resolve invoice query</div></div><div class="meta"><span class="who">D. Admin</span>28 Aug 26</div></div><div class="alert sev-amber"><div class="stripe"></div><div class="job">9101</div><div class="what"><div class="nm">Example Site <span class="tag tag-amber">watch</span> </div><div class="act">Issue RFI register</div></div><div class="meta"><span class="who">A. Estimator</span>01 Sep 26</div></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="head"><h2>Live projects</h2>
+      <span class="count">13 folders &middot; worst first</span></div>
+    <div class="scroll">
+      <table>
+        <thead><tr>
+          <th class="sev"></th><th>Job</th><th>Project</th><th>Client</th><th>Stage</th>
+          <th>Progress</th><th style="text-align:right">Value</th><th>Owner</th>
+          <th>Next action</th><th>Due</th>
+        </tr></thead>
+        <tbody><tr class="sev-red"><td class="sev"></td><td class="job-c">9005</td><td class="nm-c">Court Road ICP</td><td>Client D</td><td class="stage-c"><span class="code">L4</span> <span>Design &amp; approvals</span></td><td><div class="meter"><div class="track"><div class="fill" style="width:58%"></div></div><div class="pct">58%</div></div></td><td class="money">£76,000</td><td>S. Manager</td><td>Resolve with DNO</td><td class="date-c late">25 Aug 26</td></tr><tr class="sev-amber"><td class="sev"></td><td class="job-c">9003</td><td class="nm-c">Mill Lane Farm</td><td>Client B</td><td class="stage-c"><span class="code">L2</span> <span>LOAs &amp; consents</span></td><td><div class="meter"><div class="track"><div class="fill" style="width:42%"></div></div><div class="pct">42%</div></div></td><td class="money">£88,000</td><td>P. Manager</td><td>Chase LOAs</td><td class="date-c late">26 Aug 26</td></tr><tr class="sev-amber"><td class="sev"></td><td class="job-c">9007</td><td class="nm-c">High Street Pumps</td><td>Client F</td><td class="stage-c"><span class="code">L9</span> <span>Final account</span></td><td><div class="meter"><div class="track"><div class="fill" style="width:97%"></div></div><div class="pct">97%</div></div></td><td class="money">£6,500</td><td>D. Admin</td><td>Resolve invoice query</td><td class="date-c">28 Aug 26</td></tr><tr class="sev-green"><td class="sev"></td><td class="job-c">9006</td><td class="nm-c">Station Yard</td><td>Client E</td><td class="stage-c"><span class="code">L8</span> <span>As-builts &amp; handover</span></td><td><div class="meter"><div class="track"><div class="fill" style="width:92%"></div></div><div class="pct">92%</div></div></td><td class="money">£4,000</td><td>D. Admin</td><td>Client sign-off</td><td class="date-c">01 Sep 26</td></tr><tr class="sev-green"><td class="sev"></td><td class="job-c">9001</td><td class="nm-c">Northfield Depot</td><td>Client A</td><td class="stage-c"><span class="code">L4</span> <span>Design &amp; approvals</span></td><td><div class="meter"><div class="track"><div class="fill" style="width:58%"></div></div><div class="pct">58%</div></div></td><td class="money">£64,000</td><td>P. Manager</td><td>Chase charger layout</td><td class="date-c">02 Sep 26</td></tr><tr class="sev-green"><td class="sev"></td><td class="job-c">9009</td><td class="nm-c">Manor Farm Grid</td><td>Client H</td><td class="stage-c"><span class="code">L5</span> <span>Work pack &amp; mobilisation</span></td><td><div class="meter"><div class="track"><div class="fill" style="width:66%"></div></div><div class="pct">66%</div></div></td><td class="money">£58,000</td><td>P. Manager</td><td>Complete RAMS</td><td class="date-c">04 Sep 26</td></tr><tr class="sev-green"><td class="sev"></td><td class="job-c">9002</td><td class="nm-c">Riverside Hotel</td><td>Client A</td><td class="stage-c"><span class="code">L6</span> <span>On site</span></td><td><div class="meter"><div class="track"><div class="fill" style="width:75%"></div></div><div class="pct">75%</div></div></td><td class="money">£52,000</td><td>P. Manager</td><td>Book cable pull</td><td class="date-c">31 Aug 26</td></tr><tr class="sev-green"><td class="sev"></td><td class="job-c">9004</td><td class="nm-c">Old Works Site</td><td>Client C</td><td class="stage-c"><span class="code">L6</span> <span>On site</span></td><td><div class="meter"><div class="track"><div class="fill" style="width:75%"></div></div><div class="pct">75%</div></div></td><td class="money">£130,000</td><td>S. Manager</td><td>Weekly report</td><td class="date-c">29 Aug 26</td></tr><tr class="sev-green"><td class="sev"></td><td class="job-c">9008</td><td class="nm-c">Green Acre Solar</td><td>Client G</td><td class="stage-c"><span class="code">L7</span> <span>Energisation &amp; adoption</span></td><td><div class="meter"><div class="track"><div class="fill" style="width:85%"></div></div><div class="pct">85%</div></div></td><td class="money">£94,000</td><td>S. Manager</td><td>Chase energisation date</td><td class="date-c">03 Sep 26</td></tr><tr class="sev-none"><td class="sev"></td><td class="job-c">9010</td><td class="nm-c">Park Retail</td><td>—</td><td class="stage-c"><span class="nocard">no card</span></td><td><span class="dim">—</span></td><td class="money">—</td><td>—</td><td>—</td><td class="date-c">—</td></tr><tr class="sev-none"><td class="sev"></td><td class="job-c">9011</td><td class="nm-c">West Barn</td><td>—</td><td class="stage-c"><span class="nocard">no card</span></td><td><span class="dim">—</span></td><td class="money">—</td><td>—</td><td>—</td><td class="date-c">—</td></tr><tr class="sev-none"><td class="sev"></td><td class="job-c">9012</td><td class="nm-c">Quarry Access</td><td>—</td><td class="stage-c"><span class="nocard">no card</span></td><td><span class="dim">—</span></td><td class="money">—</td><td>—</td><td>—</td><td class="date-c">—</td></tr><tr class="sev-none"><td class="sev"></td><td class="job-c">9013</td><td class="nm-c">Harbour Wall</td><td>—</td><td class="stage-c"><span class="nocard">no card</span></td><td><span class="dim">—</span></td><td class="money">—</td><td>—</td><td>—</td><td class="date-c">—</td></tr></tbody>
+      </table>
+    </div>
+    <div class="pad"><p class="note">4 of 13 live projects have no <code>_STATUS.md</code> card yet. They are listed with the stripe greyed and no stage — unknown, not zero. Value and average progress above cover carded projects only.</p></div>
+  </section>
+
+  <section>
+    <div class="head"><h2>Stage funnel</h2>
+      <span class="count">carded projects only</span></div>
+    <div class="pad">
+      <div class="funnel"><div class="frow"><div class="code">E4</div><div class="lbl">Estimate built</div><div class="barwrap"><div class="bar" style="width:50%"></div></div><div class="n">1</div></div><div class="frow"><div class="code">E5</div><div class="lbl">Proposal issued</div><div class="barwrap"><div class="bar" style="width:50%"></div></div><div class="n">1</div></div><div class="frow"><div class="code">L2</div><div class="lbl">LOAs &amp; consents</div><div class="barwrap"><div class="bar" style="width:50%"></div></div><div class="n">1</div></div><div class="frow"><div class="code">L4</div><div class="lbl">Design &amp; approvals</div><div class="barwrap"><div class="bar" style="width:100%"></div></div><div class="n">2</div></div><div class="frow"><div class="code">L5</div><div class="lbl">Work pack &amp; mobilisation</div><div class="barwrap"><div class="bar" style="width:50%"></div></div><div class="n">1</div></div><div class="frow"><div class="code">L6</div><div class="lbl">On site</div><div class="barwrap"><div class="bar" style="width:100%"></div></div><div class="n">2</div></div><div class="frow"><div class="code">L7</div><div class="lbl">Energisation &amp; adoption</div><div class="barwrap"><div class="bar" style="width:50%"></div></div><div class="n">1</div></div><div class="frow"><div class="code">L8</div><div class="lbl">As-builts &amp; handover</div><div class="barwrap"><div class="bar" style="width:50%"></div></div><div class="n">1</div></div><div class="frow"><div class="code">L9</div><div class="lbl">Final account</div><div class="barwrap"><div class="bar" style="width:50%"></div></div><div class="n">1</div></div></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="head"><h2>No movement in 21+ days</h2>
+      <span class="count">4 live projects</span></div>
+    <div class="pad"><p class="note">
+      9010 Park Retail (198d), 9011 West Barn (170d), 9012 Quarry Access (139d), 9013 Harbour Wall (109d)
+      
+    </p></div>
+  </section>
+
+  <footer>
+    source of truth is each project folder&rsquo;s <code>_STATUS.md</code> &middot;
+    regenerate with <code>tools/build_register.py</code>
+  </footer>
+</div>
